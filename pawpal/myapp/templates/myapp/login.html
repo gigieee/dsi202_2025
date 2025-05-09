@@ -1,0 +1,28 @@
+{% extends 'pawpal_app/base.html' %}
+{% load static %}
+
+{% block title %}Pawpal - Log In{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card login-card">
+        <h1 class="auth-title">Log In</h1>
+        <form action="/login/" method="post">
+            {% csrf_token %}
+            <input type="text" id="username" name="username" placeholder="Email / Username">
+            <input type="password" id="password" name="password" placeholder="Password">
+            <button type="submit" class="auth-button">Continue</button>
+        </form>
+        <div class="auth-separator">or</div>
+        <a href="#" class="social-button google-button">
+            <img src="{% static 'images/icons/google_icon.png' %}" alt="Google">
+            Continue with Google
+        </a>
+        <a href="#" class="social-button facebook-button">
+            <img src="{% static 'images/icons/facebook_icon.png' %}" alt="Facebook">
+            Continue with Facebook
+        </a>
+        <p class="auth-footer">Don't have an account yet? <a href="/signup/">Sign Up</a></p>
+    </div>
+</div>
+{% endblock %}
