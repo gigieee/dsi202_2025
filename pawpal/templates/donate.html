@@ -1,0 +1,43 @@
+<!-- templates/donate.html -->
+{% extends 'base.html' %}
+{% block title %}Donate - PawPal{% endblock %}
+{% block content %}
+<div class="text-center mb-8">
+    <h1 class="text-3xl font-bold text-[#6d9f71] mb-2">Donate</h1>
+    <p class="max-w-2xl mx-auto text-gray-700">
+        We rescue stray dogs and cats, give them medical care and help them find loving homes. 
+        With your support, we can save more lives and cover treatment costs for animals in need.
+        Every donation makes a difference. Thank you for helping us give them a second chance.
+    </p>
+</div>
+
+<!-- Donation Type -->
+<div class="flex justify-center space-x-4 mb-6">
+    <button class="bg-[#d55e00] text-white px-6 py-2 rounded-xl">Monthly Donation</button>
+    <button class="bg-[#d99a56] text-white px-6 py-2 rounded-xl">One-off Donation</button>
+</div>
+
+<div class="text-center mb-10">
+    <button class="bg-[#6d9f71] text-white px-8 py-3 rounded-xl text-lg">Donate Now</button>
+</div>
+
+<!-- Payment Methods -->
+<div class="text-center mb-12">
+    <h3 class="text-xl font-semibold mb-2">Donate By</h3>
+    <p class="text-gray-600">Credit Card</p>
+</div>
+
+<!-- Animals needing help -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% for animal in urgent_animals %}
+    <div class="border rounded-xl shadow-md overflow-hidden">
+        <img src="{{ animal.image.url }}" alt="{{ animal.name }}" class="w-full h-48 object-cover">
+        <div class="p-4">
+            <p class="text-sm text-gray-500">No. {{ animal.id }}</p>
+            <p class="font-semibold">{{ animal.description|truncatewords:20 }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+```

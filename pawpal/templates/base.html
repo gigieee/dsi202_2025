@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PawPal{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Titan One -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50 text-[#8d6e63]">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+          
+          <!-- Left: Logo -->
+          <div class="flex items-center space-x-3">
+            <a href="{% url 'homepage' %}" class="flex items-center space-x-2">
+              <img src="{% static 'logo_pawpal.png' %}" class="h-12 w-auto" alt="PawPal Logo">
+              <span class="text-xl text-[#d55e00]" style="font-family: 'Titan One', cursive;">PawPal</span>
+            </a>
+          </div>
+      
+          <!-- Center: Menu -->
+          <div class="hidden md:flex space-x-6 text-sm md:text-base font-medium">
+            <a href="{% url 'homepage' %}" class="hover:bg-[#8d6e63] hover:text-white px-3 py-5 rounded transition">Home</a>
+            <a href="{% url 'adopt' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">Adopt</a>
+            <a href="{% url 'donate' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">Donate</a>
+            <a href="{% url 'about' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">About Us</a>
+          </div>
+      
+          <!-- Right: Heart Icon -->
+          <div class="flex items-center space-x-4">
+            <a href="{% url 'favorites' %}" class="group transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"
+                     class="w-10 h-10 transition duration-200">
+                  
+                  <!-- บ้าน (มีขอบ) -->
+                  <path d="M8 28 L32 8 L56 28 V56 H36 V40 H28 V56 H8 Z"
+                        fill="#d99a56" stroke="#5a463e" stroke-width="2"
+                        class="group-hover:fill-[#c6302c] transition" />
+                  
+                  <!-- หัวใจใหญ่กลางบ้าน (มีขอบ) -->
+                  <path d="M32 32 
+                           C28 28, 22 28, 22 34 
+                           C22 40, 32 46, 32 46 
+                           C32 46, 42 40, 42 34 
+                           C42 28, 36 28, 32 32 Z"
+                        fill="#c6302c" stroke="#a62826" stroke-width="1.5"
+                        class="group-hover:fill-[#d99a56] transition" />
+                </svg>
+              </a>
+          </div>
+        </div>
+    </nav>
+    <!-- Page Content -->
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#6d9f71] text-white text-center py-4 mt-8">
+        &copy; 2025 PawPal. All rights reserved.
+    </footer>
+
+</body>
+</html>
