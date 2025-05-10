@@ -1,0 +1,37 @@
+<!-- templates/adopt.html -->
+{% extends 'base.html' %}
+{% block title %}Adopt - PawPal{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto py-10 px-4">
+  <h1 class="text-4xl font-bold text-[#6d9f71] mb-8 text-center">Meet Your New Best Friend</h1>
+
+  <!-- Pet Cards Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+    {% for animal in animals %}
+    <div class="border rounded-xl shadow hover:shadow-lg overflow-hidden bg-white relative">
+      <img src="{{ animal.image.url }}" alt="{{ animal.name }}" class="w-full h-52 object-cover">
+      <div class="p-4">
+        <h2 class="text-xl font-semibold text-[#8d6e63]">{{ animal.name }}</h2>
+        <p class="text-sm text-gray-600 mb-2">Breed: {{ animal.breed }} | Age: {{ animal.age }}</p>
+        <p class="text-gray-700 text-sm mb-4">{{ animal.description|truncatewords:20 }}</p>
+        <a href="#" class="text-[#d55e00] font-medium hover:underline">View Profile</a>
+      </div>
+
+      <!-- Heart icon top right -->
+      <button class="absolute top-3 right-3 text-[#d99a56] hover:text-[#d55e00]">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
+          4.42 3 7.5 3c1.74 0 3.41 0.81 
+          4.5 2.09C13.09 3.81 14.76 3 
+          16.5 3 19.58 3 22 5.42 
+          22 8.5c0 3.78-3.4 6.86-8.55 
+          11.54L12 21.35z"/>
+        </svg>
+      </button>
+    </div>
+    {% empty %}
+    <p class="text-gray-600">No adoptable pets at the moment. Please check back soon!</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

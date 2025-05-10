@@ -1,0 +1,37 @@
+<!-- templates/homepage.html -->
+{% extends 'base.html' %}
+{% block title %}Home - PawPal{% endblock %}
+{% block content %}
+<div class="text-center mb-10">
+    <h1 class="text-4xl font-bold mb-4 text-[#6d9f71]">find your paw</h1>
+    <div class="space-x-4">
+        
+        <a href="{% url 'donate' %}" class="bg-[#d99a56] text-white px-6 py-2 rounded-xl">Donate</a>
+    </div>
+</div>
+
+<!-- Featured Animals -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    {% for animal in featured_animals %}
+    <div class="border rounded-xl shadow-md overflow-hidden">
+        <img src="{{ animal.image.url }}" alt="{{ animal.name }}" class="w-full h-48 object-cover">
+        <div class="p-4">
+            <p class="text-sm text-gray-500">No. {{ animal.id }}</p>
+            <p class="font-semibold">Breed: {{ animal.breed }}</p>
+            <p>{{ animal.description|truncatewords:15 }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="text-right mt-4">
+   
+</div>
+
+<!-- Personality Test -->
+<div class="mt-16 text-center">
+    <h2 class="text-2xl font-bold mb-2">Personality Test</h2>
+    <p>Find the perfect furry match for you!</p>
+    <a href="#" class="mt-4 inline-block bg-[#6d9f71] text-white px-6 py-2 rounded-xl">Start Test</a>
+</div>
+{% endblock %}
