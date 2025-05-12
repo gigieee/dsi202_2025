@@ -1,7 +1,38 @@
 <!-- templates/homepage.html -->
+
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Home - PawPal{% endblock %}
 {% block content %}
+
+<!-- Personality Test -->
+
+<!-- Moving Background Section -->
+<div class="relative rounded-2xl shadow-lg p-8 overflow-hidden animate-gradient-x bg-gradient-to-r from-[#dd6b20] via-[#dd6b20] to-[#fdba74]">
+
+    <!-- Cloud -->
+    <div class="absolute w-24 h-12 bg-white opacity-30 rounded-full top-4 left-4 animate-cloud" style="animation-delay: 1s;"></div>
+    <div class="absolute w-32 h-16 bg-white opacity-30 rounded-full top-12 left-1/2 animate-cloud" style="animation-delay: 2s;"></div>
+  
+    <!-- Text Content -->
+    <div class="relative z-10 text-[#fffaf0] text-center flex flex-col items-center justify-center space-y-3">
+        <h2 class="text-4xl text-[#fffaf0] font-extrabold mb-2" style="font-family: 'Fredoka', sans-serif;">Personality Test</h2>
+        <p class="text-white text-sm">Find your paw <span class="text-[#fdba74]">🐾</span></p>
+    
+      <!-- CTA Button -->
+        <a  href="{% url 'personality_test' %}"
+            class="bg-[#fdf3e3] text-[#dd6b20] font-bold px-8 py-2 rounded-full border-4 border-[#63360c] 
+                   hover:bg-[#6d9f71] hover:text-[#fffaf0] hover:border-[#6d9f71] 
+                   transition-all duration-300 ease-in-out shadow-md">
+            Start Test
+        </a>
+      
+      <!-- Cat walks in front -->
+        <img src="{% static 'cat.png' %}" alt="Cat" class="animate-cat-walk" style="right:-150px; bottom:0;" />
+        <img src="{% static 'dog.png' %}" alt="Dog" class="animate-dog-walk" style="right:-200px; bottom:0;" />
+    </div>
+</div>
+
 <div class="text-center mb-10">
     <h1 class="text-4xl font-bold mb-4 text-[#6d9f71]">find your paw</h1>
     <div class="space-x-4">
@@ -34,4 +65,6 @@
     <p>Find the perfect furry match for you!</p>
     <a href="#" class="mt-4 inline-block bg-[#6d9f71] text-white px-6 py-2 rounded-xl">Start Test</a>
 </div>
+
+
 {% endblock %}

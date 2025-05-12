@@ -21,3 +21,12 @@ def favorites(request):
     fav_ids = request.session.get('favorites', [])
     pets = Animal.objects.filter(id__in=fav_ids)
     return render(request, 'favorites.html', {'favorites': pets})
+
+def login_view(request):
+    return render(request, 'login.html')
+
+def signup_view(request):
+    return render(request, 'signup.html')
+
+def personality_test_view(request):
+    return render(request, 'personality_test.html')

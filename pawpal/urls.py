@@ -27,4 +27,7 @@ urlpatterns = [
     path('donate/', views.donate, name='donate'),
     path('about/', views.about, name='about'),
     path('favorites/', views.favorites, name='favorites'),
+    path('login/', views.login_view, name='login'),
+    path('signup/', views.signup_view, name='signup'),
+    path('personality/', views.personality_test_view, name='personality_test')
 ]

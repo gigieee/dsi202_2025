@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Personality Test - PawPal{% endblock %}
+{% block content %}
+<div class="bg-gray-50 min-h-[80vh] py-12 px-4">
+  <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-8">
+    <h1 class="text-2xl font-bold text-[#6d9f71] mb-6 text-center">🐾 แบบทดสอบบุคลิกภาพของคุณ</h1>
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Question 1 -->
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-2">1. วันหยุดที่คุณชอบคือแบบไหน?</label>
+        <select name="q1" required class="w-full border rounded px-3 py-2">
+          <option value="">-- เลือกคำตอบ --</option>
+          <option value="adventure">ผจญภัย/ลุยธรรมชาติ</option>
+          <option value="relax">นั่งชิล/นอนพัก</option>
+          <option value="social">เจอเพื่อน/ปาร์ตี้</option>
+        </select>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-2">2. คุณนิยามตัวเองว่าอย่างไร?</label>
+        <select name="q2" required class="w-full border rounded px-3 py-2">
+          <option value="">-- เลือกคำตอบ --</option>
+          <option value="introvert">เงียบขรึม</option>
+          <option value="extrovert">ชอบเข้าสังคม</option>
+          <option value="balanced">สมดุล</option>
+        </select>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-2">3. สไตล์การใช้ชีวิตของคุณ?</label>
+        <select name="q3" required class="w-full border rounded px-3 py-2">
+          <option value="">-- เลือกคำตอบ --</option>
+          <option value="active">กระฉับกระเฉง</option>
+          <option value="calm">เรียบง่าย/นิ่ง</option>
+          <option value="mixed">แล้วแต่อารมณ์</option>
+        </select>
+      </div>
+
+      <button type="submit" class="bg-[#6d9f71] text-white font-semibold px-6 py-2 rounded hover:bg-[#5a8661] transition">
+        ส่งคำตอบ
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

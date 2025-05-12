@@ -11,31 +11,337 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Canva+Sans:wght@400;700&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+    /* Font */
+    @font-face {
+        font-family: 'Bryndan Write';
+        src: url('path/to/BryndanWrite-Regular.ttf');  
+    }
+    @font-face {
+        font-family: 'Boriboon';
+        src: url('path/to/Boriboon-Regular.ttf');  
+    }
+
+    /* Animation */
+    @keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+    }
+    .animate-gradient-x {
+    background-size: 300% 300%;
+    animation: gradient-x 10s ease infinite;
+    }
+
+    @keyframes cloudFloat {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(100vw); }
+    }
+    .animate-cloud {
+        animation: cloudFloat 50s linear infinite;
+    }
+
+    @keyframes catWalk {
+        0%   { right: -150px; bottom: 0; transform: translateY(); }
+        50%  { transform: translateY(0); } /* กระโดดขึ้นเล็กน้อย */
+        100% { right: 100%; bottom: 0; transform: translateY(0); }
+    }
+
+    .animate-cat-walk {
+        animation: catWalk 20s linear infinite;
+        position: absolute;
+        height: 80px;
+    }
+
+    @keyframes dogWalk {
+        0%   { right: -200px; bottom: 0; transform: translateY(0); }
+        50%  { transform: translateY(-10px); }
+        100% { right: 100%; bottom: 0; transform: translateY(0); }
+    }
+    .animate-dog-walk {
+        animation: dogWalk 24s linear infinite;
+        position: absolute;
+        height: 80px;
+    }
+
+
+    /* General */
+    body {
+        font-family: 'Canva Sans', 'TH Sarabun New', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f0e3;
+        color: #8d6e63;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    h1, h2 {
+        font-family: 'Bryndan Write', cursive;
+        color: #8d6e63;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    p {
+        font-family: 'Sarabun', sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    a {
+        color: #d55e00;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+
+    /* Footer Styles */
+    footer {
+        background-color: #f8f0e3;
+        color: #8d6e63;
+        padding: 40px 0;
+        text-align: center;
+        margin-top: 20px;
+        border-top: 1px solid #ddd;
+        /* Gradient background */
+        background: linear-gradient(135deg, #f8f0e3, #e0f2f1);
+    }
+
+    .footer-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: flex-start;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .footer-section {
+        margin-bottom: 30px;
+        width: 100%;
+    }
+
+    .footer-section h3 {
+        font-family: 'Bryndan Write', cursive;
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #8d6e63;
+        /* Added text shadow */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .footer-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 10px;
+    }
+
+    .footer-section a {
+        color: #8d6e63;
+        text-decoration: none;
+        font-size: 16px;
+        /* Added transition */
+        transition: color 0.3s ease;
+    }
+
+    .footer-section a:hover {
+        color: #d55e00;
+        /* Underline and bold on hover */
+        text-decoration: underline;
+        font-weight: bold;
+    }
+
+    .contact-info p {
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .social-icons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+    .social-icons a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #d55e00;
+        color: white;
+        font-size: 20px;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        /* Added animation */
+        animation: pulse 2s infinite;
+    }
+
+    .social-icons a:hover {
+        background-color: #b44800;
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+        /* Stop animation on hover */
+        animation: none;
+    }
+
+    .copyright {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #8d6e63;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        /* Background with opacity */
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Responsive adjustments */
+    @media (min-width: 768px) {
+        .footer-section {
+            width: 50%;
+            text-align: left;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .footer-section {
+            width: 25%;
+            /* Added text alignment for larger screens */
+            text-align: left;
+        }
+        .footer-content {
+            justify-content: space-around;
+        }
+    }
+
+    /* Added styles for newsletter subscription */
+    .newsletter-section {
+        width: 100%;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+
+    .newsletter-section h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #8d6e63;
+        /* Added text shadow */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .newsletter-form {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
+    .newsletter-input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 10px 0 0 10px;
+        font-size: 16px;
+        color: #8d6e63;
+        margin-right: 0;
+        /* Added transition */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .newsletter-submit {
+        padding: 12px 20px;
+        background-color: #d55e00;
+        color: white;
+        border: none;
+        border-radius: 0 10px 10px 0;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        white-space: nowrap;
+        /* Added shadow */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .newsletter-submit:hover {
+        background-color: #b44800;
+        /* Increased shadow on hover */
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    }
+
+    .newsletter-input:focus {
+        outline: none;
+        border-color: #d55e00;
+        box-shadow: 0 0 5px rgba(213, 94, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .newsletter-form {
+            flex-wrap: wrap;
+        }
+        .newsletter-input {
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 10px;
+        }
+        .newsletter-submit {
+            border-radius: 0 0 10px 10px;
+        }
+    }
+
+    /* Keyframes for pulse animation */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    </style>
 </head>
-<body class="bg-white text-gray-800 font-sans">
+<body class="flex flex-col min-h-screen">
 
     <!-- Navbar -->
     <nav class="bg-white shadow-md sticky top-0 z-50 text-[#8d6e63]">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
           
           <!-- Left: Logo -->
-          <div class="flex items-center space-x-3">
+        
             <a href="{% url 'homepage' %}" class="flex items-center space-x-2">
-              <img src="{% static 'logo_pawpal.png' %}" class="h-12 w-auto" alt="PawPal Logo">
+                <img src="{% static 'logo_pawpal_2025.png' %}"
+                alt="PawPal Logo"
+                class="w-16 h-16 md:w-20 md:h-20 object-contain rounded-xl shadow-sm" />
               <span class="text-xl text-[#d55e00]" style="font-family: 'Titan One', cursive;">PawPal</span>
             </a>
-          </div>
+
+          <!-- Hamburger button (mobile only) -->
+          <button class="md:hidden text-[#8d6e63] focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
       
-          <!-- Center: Menu -->
-          <div class="hidden md:flex space-x-6 text-sm md:text-base font-medium">
+          <!-- Center: Menu (desktop) -->
+          <div class="hidden md:flex items-center space-x-6 text-sm md:text-base font-medium">
             <a href="{% url 'homepage' %}" class="hover:bg-[#8d6e63] hover:text-white px-3 py-5 rounded transition">Home</a>
             <a href="{% url 'adopt' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">Adopt</a>
             <a href="{% url 'donate' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">Donate</a>
             <a href="{% url 'about' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">About Us</a>
           </div>
       
-          <!-- Right: Heart Icon -->
-          <div class="flex items-center space-x-4">
+          <!-- Right: Icons -->
+          <div class="hidden md:flex items-center space-x-4">
+            <!-- Favorite Icon -->
             <a href="{% url 'favorites' %}" class="group transition duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"
                      class="w-10 h-10 transition duration-200">
@@ -54,19 +360,86 @@
                         fill="#c6302c" stroke="#a62826" stroke-width="1.5"
                         class="group-hover:fill-[#d99a56] transition" />
                 </svg>
-              </a>
+            </a>
+            <!-- Profile icon -->
+             <a href="{% url 'login' %}" class="text-[#8d6e63] hover:text-[#c6302c]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+                </svg>
+            </a>
           </div>
         </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden px-4 pb-4">
+            <a href="{% url 'homepage' %}" class="block py-2 text-[#8d6e63] hover:bg-[#8d6e63] hover:text-white rounded-md px-3">Home</a>
+            <a href="{% url 'adopt' %}" class="block py-2 text-[#8d6e63] hover:bg-[#8d6e63] hover:text-white rounded-md px-3">Adopt</a>
+            <a href="{% url 'donate' %}" class="block py-2 text-[#8d6e63] hover:bg-[#8d6e63] hover:text-white rounded-md px-3">Donate</a>
+            <a href="{% url 'about' %}" class="block py-2 text-[#8d6e63] hover:bg-[#8d6e63] hover:text-white rounded-md px-3">About Us</a>
+            <div class="flex space-x-4 mt-3 px-3">
+            <a href="{% url 'favorites' %}" class="text-[#d99a56] hover:text-[#c6302c]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-6 h-6">
+                <path d="M8 28 L32 8 L56 28 V56 H36 V40 H28 V56 H8 Z" fill="#8d6e63" stroke="#5a463e" stroke-width="2" />
+                <path d="M32 32 C28 28, 22 28, 22 34 C22 40, 32 46, 32 46 C32 46, 42 40, 42 34 C42 28, 36 28, 32 32 Z" fill="#c6302c" stroke="#a62826" stroke-width="1.5" />
+                </svg>
+            </a>
+            <a href="{% url 'login' %}" class="text-[#8d6e63] hover:text-[#c6302c]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+                </svg>
+            </a>
+            </div>
+        </div>
     </nav>
+
     <!-- Page Content -->
     <main class="container mx-auto px-4 py-8">
         {% block content %}
         {% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-[#6d9f71] text-white text-center py-4 mt-8">
-        &copy; 2025 PawPal. All rights reserved.
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <p>PawPal is dedicated to helping stray animals find loving homes. We provide resources, support, and a platform to connect adopters with animals in need.</p>
+            </div>
+             <div class="newsletter-section">
+                <h3>Subscribe to Our Newsletter</h3>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email">
+                    <button type="submit" class="newsletter-submit">Subscribe</button>
+                </form>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <div class="contact-info">
+                    <p>Email: info@pawpal.com</p>
+                    <p>Phone: +123 456 7890</p>
+                    <p>Address: 123 Main St, City, State, Zip</p>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Get Involved</h3>
+                <ul>
+                    <li><a href="#">Adopt</a></li>
+                    <li><a href="#">Foster</a></li>
+                    <li><a href="#">Donate</a></li>
+                    <li><a href="#">Volunteer</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2025 PawPal. All rights reserved.
+        </div>
     </footer>
 
 </body>
