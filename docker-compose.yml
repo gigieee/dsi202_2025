@@ -11,4 +11,4 @@ services:
       - DEBUG=True
 
 volumes:
-  static_volume:
+  - ./static:/app/static

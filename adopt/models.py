@@ -2,24 +2,7 @@ from django.db import models
 from multiselectfield import MultiSelectField
 
 # Create models here
-class Animal(models.Model):
-    SPECIES_CHOICES = [
-        ('dog', 'Dog'),
-        ('cat', 'Cat'),
-    ]
-    
-    
-    age = models.PositiveIntegerField()
-    gender = models.CharField(max_length=10)
-    breed = models.CharField(max_length=100)
-    species = models.CharField(max_length=10, choices=SPECIES_CHOICES)
-    description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='animal_images/', null=True, blank=True)
-    is_adopted = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"{self.name} ({self.species})"
-    
 #Stray Animals
 class StrayAnimal(models.Model):
     # --- Choices ---
@@ -90,6 +73,7 @@ class StrayAnimal(models.Model):
         ('Barking and Howling', 'Barking and Howling'),
         ('Biting', 'Biting'),
         ('Chewing', 'Chewing'),
+        ('Others', 'Others')
     ]
 
     DAYS_ON_PAWPAL_CHOICES = [
@@ -118,11 +102,12 @@ class StrayAnimal(models.Model):
     color = models.CharField(max_length=50, choices=COLOR_CHOICES)
     care_and_behavior = models.CharField(max_length=50, choices=CARE_CHOICES)
     days_on_pawpal = models.CharField(max_length=10, choices=DAYS_ON_PAWPAL_CHOICES)
-    location = models.CharField(max_length=100)
+    location = models.CharField(max_length=100, blank=True)
     image = models.ImageField(upload_to='animal_images/', blank=True, null=True)
-    story = models.TextField()
+    story_describe = models.TextField(blank=True)
     behavior = models.CharField(max_length=50, choices=BEHAVIOR_CHOICES)
-    health_status = models.TextField()
+    health_status = models.TextField(blank=True)
+    is_adopted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def get_age_in_years(self):

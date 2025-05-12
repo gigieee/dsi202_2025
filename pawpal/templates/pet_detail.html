@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ pet.name }} - PawPal{% endblock %}
+{% block content %}
+
+<div class="max-w-4xl mx-auto mt-10 bg-[#fffaf0] rounded-xl shadow-md overflow-hidden">
+  <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-80 object-cover">
+
+  <div class="p-6" style="font-family: 'Lexend', sans-serif;">
+    <div class="flex justify-between items-center">
+      <h2 class="text-3xl font-bold text-[#8d6e63]">{{ pet.name }}</h2>
+      
+      <!-- Favorite icon -->
+      <form method="post" action="{% url 'toggle_favorite' pet.id %}">
+        {% csrf_token %}
+        <button type="submit" title="Favorite this pet">
+          {% if is_favorited %}
+            ❤️
+          {% else %}
+            🤍
+          {% endif %}
+        </button>
+      </form>
+    </div>
+
+    <p class="text-sm text-gray-600 italic mt-1">{{ pet.breed }}</p>
+    <div class="mt-4 grid grid-cols-2 gap-4 text-sm text-[#5a463e]">
+      <p><strong>Gender:</strong> {{ pet.gender|capfirst }}</p>
+      <p><strong>Size:</strong> {{ pet.size|capfirst }}</p>
+      <p><strong>Age:</strong> {{ pet.age_value }} {{ pet.age_unit }}</p>
+      <p><strong>Color:</strong> {{ pet.color }}</p>
+      <p><strong>Coat:</strong> {{ pet.coat_length }}</p>
+      <p><strong>Good with:</strong> {{ pet.good_with|join:", " }}</p>
+      <p><strong>Health:</strong> {{ pet.health_status }}</p>
+      <p><strong>Behavior:</strong> {{ pet.behavior }}</p>
+    </div>
+
+    <div class="mt-6">
+      <h3 class="text-lg font-bold mb-2">Story</h3>
+      <p class="text-gray-700 leading-relaxed">{{ pet.story_describe }}</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

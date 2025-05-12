@@ -16,12 +16,15 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('adopt.urls')),
     path('', views.homepage, name='homepage'),
     path('adopt/', views.adopt, name='adopt'),
     path('donate/', views.donate, name='donate'),
@@ -29,5 +32,9 @@ urlpatterns = [
     path('favorites/', views.favorites, name='favorites'),
     path('login/', views.login_view, name='login'),
     path('signup/', views.signup_view, name='signup'),
-    path('personality/', views.personality_test_view, name='personality_test')
+    path('personality/', views.personality_test_view, name='personality_test'),
+    path('pet/<int:pet_id>/', views.pet_detail, name='pet_detail')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
