@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from . import views
+from adopt import views 
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -28,8 +28,9 @@ urlpatterns = [
     path('', views.homepage, name='homepage'),
     path('adopt/', views.adopt, name='adopt'),
     path('donate/', views.donate, name='donate'),
-    path('about/', views.about, name='about'),
-    path('favorites/', views.favorites, name='favorites'),
+    path('donate/general/', views.general_donate_view, name='general_donate'),
+    path('about/', views.about_us, name='about'),
+    
     path('login/', views.login_view, name='login'),
     path('signup/', views.signup_view, name='signup'),
     path('personality/', views.personality_test_view, name='personality_test'),

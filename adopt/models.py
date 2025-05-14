@@ -1,7 +1,6 @@
 from django.db import models
 from multiselectfield import MultiSelectField
-
-# Create models here
+from django.contrib.auth.models import User
 
 #Stray Animals
 class StrayAnimal(models.Model):
@@ -139,3 +138,100 @@ class StrayAnimal(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.breed} ({self.pet_id})"
+
+
+#Donation & Supporting 
+# Overview Donate - ไม่อิงสัตว์รายตัว
+class GeneralDonation(models.Model):
+    donor_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    message = models.TextField(blank=True, null=True)
+    payment_method = models.CharField(max_length=50, choices=[
+        ('promptpay', 'PromptPay'),
+        ('credit_card', 'Credit Card'),
+    ])
+    slip_image = models.ImageField(upload_to='slips/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.donor_name} - {self.amount} THB"
+
+
+# Medical Sponsorship - สำหรับกรณีบริจาคเพื่อการรักษาสัตว์
+class MedicalSponsorship(models.Model):
+    pet = models.ForeignKey("adopt.StrayAnimal", on_delete=models.CASCADE, related_name="medical_support")
+    goal_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    current_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    description = models.TextField(help_text="Explain the medical condition or need")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.pet.name} Medical Fund"
+
+    def get_progress_percent(self):
+        if self.goal_amount == 0:
+            return 0
+        return min(round((self.current_amount / self.goal_amount) * 100, 2), 100)
+
+
+# Record of donation under sponsorship
+class SponsorshipDonation(models.Model):
+    pet = models.ForeignKey(
+    StrayAnimal, 
+    on_delete=models.CASCADE,
+    null=True,  # ชั่วคราว
+    blank=True  # เผื่อในฟอร์ม admin
+)
+    donor_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(
+    max_length=50,
+    choices=[
+        ('promptpay', 'PromptPay'),
+        ('credit_card', 'Credit Card'),
+    ]
+)
+    payment_slip = models.ImageField(upload_to='sponsorship_slips/', default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.donor_name} -> {self.pet.name} ({self.amount} THB)"
+
+# Adoption
+class AdoptionRequest(models.Model):
+    pets = models.ManyToManyField(StrayAnimal, related_name='adoption_requests')
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    address = models.TextField()
+    subdistrict = models.CharField(max_length=100)
+    district = models.CharField(max_length=100)
+    province = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=10)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField()
+    household_info = models.TextField()
+    other_pets = models.TextField(blank=True)
+    property_description = models.TextField()
+    jobs = models.CharField(max_length=200, default='Not specified')
+    motivation = models.TextField()
+    status = models.CharField(
+        max_length=20,
+        choices=[("pending", "Pending"), ("approved", "Approved"), ("rejected", "Rejected")],
+        default="pending"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} - {self.email}"
+    
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='blog/')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

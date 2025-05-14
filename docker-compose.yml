@@ -6,9 +6,8 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-      - static_volume:/app/static
     environment:
       - DEBUG=True
 
 volumes:
-  - ./static:/app/static
+  static_volume:

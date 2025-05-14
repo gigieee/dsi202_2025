@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}{{ blog.title }}{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-10 bg-white rounded-xl shadow-md">
+    <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="w-full h-64 object-cover rounded-xl mb-6">
+    <h1 class="text-3xl font-bold text-[#d55e00] mb-4">{{ blog.title }}</h1>
+    <p class="text-gray-700 whitespace-pre-line leading-relaxed">{{ blog.content }}</p>
+</div>
+{% endblock %}

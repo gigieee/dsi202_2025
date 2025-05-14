@@ -1,45 +1,45 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}{{ pet.name }} - PawPal{% endblock %}
+{% block title %}{{ pet.name }} - Details{% endblock %}
+
 {% block content %}
+<div class="max-w-4xl mx-auto px-6 py-10 bg-white rounded-xl shadow-lg">
+    <div class="flex flex-col md:flex-row items-center gap-6">
+        <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-72 h-72 object-cover rounded-lg shadow-md">
+        <div class="flex-1 space-y-2">
+            <h1 class="text-3xl font-bold text-[#523a28]">{{ pet.name }}</h1>
+            <p><strong>Pet ID:</strong> {{ pet.pet_id }}</p>
+            <p><strong>Species:</strong> {{ pet.species|title }}</p>
+            <p><strong>Breed:</strong> {{ pet.breed }}</p>
+            <p><strong>Gender:</strong> {{ pet.gender|title }}</p>
+            <p><strong>Age:</strong> {{ pet.age_value }} {{ pet.age_unit }}</p>
+            <p><strong>Color:</strong> {{ pet.color }}</p>
+            <p><strong>Size:</strong> {{ pet.size|title }}</p>
+            <p><strong>Story:</strong> {{ pet.story_describe }}</p>
+            <p><strong>Health:</strong> {{ pet.health_status }}</p>
 
-<div class="max-w-4xl mx-auto mt-10 bg-[#fffaf0] rounded-xl shadow-md overflow-hidden">
-  <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-80 object-cover">
-
-  <div class="p-6" style="font-family: 'Lexend', sans-serif;">
-    <div class="flex justify-between items-center">
-      <h2 class="text-3xl font-bold text-[#8d6e63]">{{ pet.name }}</h2>
-      
-      <!-- Favorite icon -->
-      <form method="post" action="{% url 'toggle_favorite' pet.id %}">
-        {% csrf_token %}
-        <button type="submit" title="Favorite this pet">
-          {% if is_favorited %}
-            ❤️
-          {% else %}
-            🤍
-          {% endif %}
-        </button>
-      </form>
+            <!-- Action buttons -->
+            <div class="flex gap-4 mt-4">
+                <a href="{% url 'request_adopt' pet.id %}" class="px-6 py-2 bg-[#d55e00] text-white rounded-full hover:bg-[#b54800]">Adopt</a>
+                {% if sponsorship %}
+                    <a href="{% url 'sponsorship_detail' sponsorship.id %}" class="px-6 py-2 bg-[#6d9f71] text-white rounded-full hover:bg-[#51865b]">Sponsor</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-    <p class="text-sm text-gray-600 italic mt-1">{{ pet.breed }}</p>
-    <div class="mt-4 grid grid-cols-2 gap-4 text-sm text-[#5a463e]">
-      <p><strong>Gender:</strong> {{ pet.gender|capfirst }}</p>
-      <p><strong>Size:</strong> {{ pet.size|capfirst }}</p>
-      <p><strong>Age:</strong> {{ pet.age_value }} {{ pet.age_unit }}</p>
-      <p><strong>Color:</strong> {{ pet.color }}</p>
-      <p><strong>Coat:</strong> {{ pet.coat_length }}</p>
-      <p><strong>Good with:</strong> {{ pet.good_with|join:", " }}</p>
-      <p><strong>Health:</strong> {{ pet.health_status }}</p>
-      <p><strong>Behavior:</strong> {{ pet.behavior }}</p>
+    {% if sponsorship %}
+    <!-- Medical Sponsorship Section -->
+    <div class="mt-10 p-6 bg-[#fff8eb] rounded-lg border border-orange-200">
+        <h2 class="text-2xl font-bold text-[#d55e00] mb-2">Medical Support Needed</h2>
+        <p class="text-gray-700 mb-2">{{ sponsorship.description }}</p>
+        <p class="text-sm mb-2"><strong>Goal:</strong> ฿{{ sponsorship.goal_amount|floatformat:0 }} | <strong>Raised:</strong> ฿{{ sponsorship.current_amount|floatformat:0 }}</p>
+        
+        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden mb-2">
+            <div class="h-3 bg-[#6d9f71]" style="width: {{ sponsorship.get_progress_percent }}%;"></div>
+        </div>
+        <p class="text-xs text-right text-gray-600">{{ sponsorship.get_progress_percent }}% funded</p>
     </div>
-
-    <div class="mt-6">
-      <h3 class="text-lg font-bold mb-2">Story</h3>
-      <p class="text-gray-700 leading-relaxed">{{ pet.story_describe }}</p>
-    </div>
-  </div>
+    {% endif %}
 </div>
-
 {% endblock %}

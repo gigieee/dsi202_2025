@@ -1,37 +1,123 @@
-<!-- templates/adopt.html -->
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Adopt - PawPal{% endblock %}
+
 {% block content %}
-<div class="max-w-6xl mx-auto py-10 px-4">
-  <h1 class="text-4xl font-bold text-[#6d9f71] mb-8 text-center">Meet Your New Best Friend</h1>
+
+<div class="max-w-7xl mx-auto py-10 px-4">
+  <h1 class="text-4xl font-bold text-center text-[#523a28] mb-8" style="font-family: 'Lexend', sans-serif;">Meet Your New Best Friend</h1>
+
+  <!-- Search & Filter -->
+  <form method="GET" class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <input type="text" name="q" placeholder="Search by name, breed, color, ID..." value="{{ request.GET.q }}" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+
+    <select name="species" class="w-full md:w-1/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+      <option value="">All Species</option>
+      <option value="dog" {% if request.GET.species == 'dog' %}selected{% endif %}>Dog</option>
+      <option value="cat" {% if request.GET.species == 'cat' %}selected{% endif %}>Cat</option>
+    </select>
+
+    <button type="submit" class="bg-[#d55e00] text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-[#b54800] transition">Search</button>
+  </form>
 
   <!-- Pet Cards Grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-    {% for animal in animals %}
-    <div class="border rounded-xl shadow hover:shadow-lg overflow-hidden bg-white relative">
-      <img src="{{ animal.image.url }}" alt="{{ animal.name }}" class="w-full h-52 object-cover">
+    {% for pet in available_pets %}
+    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition relative cursor-pointer" onclick="openPetModal({{ pet.id }})">
+      <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-56 object-cover">
       <div class="p-4">
-        <h2 class="text-xl font-semibold text-[#8d6e63]">{{ animal.name }}</h2>
-        <p class="text-sm text-gray-600 mb-2">Breed: {{ animal.breed }} | Age: {{ animal.age }}</p>
-        <p class="text-gray-700 text-sm mb-4">{{ animal.description|truncatewords:20 }}</p>
-        <a href="#" class="text-[#d55e00] font-medium hover:underline">View Profile</a>
+        <h3 class="text-xl font-bold text-[#6d4c41] mb-1">{{ pet.name }}</h3>
+        <p class="text-sm text-gray-600">Breed: {{ pet.breed }}</p>
+        <p class="text-sm text-gray-600">Color: {{ pet.color }}</p>
+        <p class="text-sm text-gray-600">ID: {{ pet.pet_id }}</p>
       </div>
-
-      <!-- Heart icon top right -->
-      <button class="absolute top-3 right-3 text-[#d99a56] hover:text-[#d55e00]">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
-          4.42 3 7.5 3c1.74 0 3.41 0.81 
-          4.5 2.09C13.09 3.81 14.76 3 
-          16.5 3 19.58 3 22 5.42 
-          22 8.5c0 3.78-3.4 6.86-8.55 
-          11.54L12 21.35z"/>
+      <button onclick="event.stopPropagation(); toggleFavorite('{{ pet.id }}')" class="absolute top-2 right-2">
+        <svg id="heart-{{ pet.id }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="1.5" stroke="currentColor"
+             class="w-7 h-7 transition duration-200"
+             style="color: gray;">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                   2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 
+                   4.5 2.09C13.09 3.81 14.76 3 
+                   16.5 3 19.58 3 22 5.42 22 8.5
+                   c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
         </svg>
       </button>
     </div>
     {% empty %}
-    <p class="text-gray-600">No adoptable pets at the moment. Please check back soon!</p>
+      <p class="text-gray-500 col-span-full text-center">No animals found.</p>
     {% endfor %}
   </div>
 </div>
+
+<!-- Pet Modal -->
+<div id="petModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex justify-center items-center">
+  <div class="bg-white rounded-2xl max-w-lg w-full p-6 relative">
+    <button onclick="closePetModal()" class="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-2xl">&times;</button>
+    <div id="petModalContent">
+      <!-- JS dynamically fills this -->
+    </div>
+  </div>
+</div>
+
+<!-- Favorite JS (localStorage) -->
+<script>
+  function toggleFavorite(petId) {
+    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    const index = favorites.indexOf(petId);
+    if (index > -1) {
+      favorites.splice(index, 1);
+    } else {
+      favorites.push(petId);
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    updateHeartIcons();
+  }
+
+  function updateHeartIcons() {
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    document.querySelectorAll("[id^='heart-']").forEach(el => {
+      const petId = el.id.replace("heart-", "");
+      el.style.color = favorites.includes(petId) ? "#e53935" : "gray";
+    });
+  }
+
+  function openPetModal(petId) {
+    fetch(`/api/pet/${petId}/`)  // backend endpoint to return pet JSON
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('petModalContent').innerHTML = `
+          <div class="text-center">
+            <img src="${data.image_url}" alt="${data.name}" class="w-40 h-40 object-cover mx-auto mb-4 rounded-xl">
+            <h3 class="text-2xl font-bold text-[#6d4c41]">${data.name}</h3>
+            <p class="text-sm text-gray-600">Breed: ${data.breed}</p>
+            <p class="text-sm text-gray-600">Color: ${data.color}</p>
+            <p class="text-sm text-gray-600">Age: ${data.age} ${data.age_unit}</p>
+            <p class="text-sm text-gray-600 mb-2">ID: ${data.pet_id}</p>
+            <p class="text-sm text-gray-800 mb-4">${data.story}</p>
+            ${data.is_medical ? `
+              <div class="mb-4">
+                <div class="w-full bg-gray-200 h-2 rounded-full">
+                  <div class="bg-[#6d9f71] h-2 rounded-full" style="width: ${data.progress}%"></div>
+                </div>
+                <p class="text-xs text-gray-600 mt-1">Medical Help: ${data.progress}% funded</p>
+                <p class="text-xs text-red-600">${data.medical_description}</p>
+              </div>
+            ` : ''}
+            <button onclick="closePetModal()" class="mt-4 px-6 py-2 bg-[#d55e00] text-white rounded-full">Close</button>
+          </div>
+        `;
+        document.getElementById('petModal').classList.remove('hidden');
+      });
+  }
+
+  function closePetModal() {
+    document.getElementById('petModal').classList.add('hidden');
+  }
+
+  document.addEventListener("DOMContentLoaded", updateHeartIcons);
+</script>
+
 {% endblock %}

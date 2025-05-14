@@ -1,44 +1,61 @@
-<!-- templates/favorites.html -->
 {% extends 'base.html' %}
-{% block title %}Fav Pets - PawPal{% endblock %}
+{% block title %}Favorite Pets - PawPal{% endblock %}
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-8">
-  <h1 class="text-4xl font-bold text-center text-[#6d9f71] mb-8">Fav Lists</h1>
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <h1 class="text-3xl font-bold text-center mb-6 text-[#4e6e4e]">Fav Lists</h1>
+  <div id="favoritesContainer" class="space-y-6"></div>
 
-  {% if favorites %}
-  <div class="grid md:grid-cols-2 gap-8">
-    {% for pet in favorites %}
-    <div class="flex border rounded-xl overflow-hidden bg-[#fff7e8] shadow-md">
-      <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-40 h-40 object-cover">
-      <div class="p-4 flex-1">
-        <p class="text-gray-800 font-semibold mb-1">No. {{ pet.code }}</p>
-        <p class="text-sm text-gray-700">Breed: {{ pet.breed }}</p>
-        <p class="text-sm text-gray-700">Gender: {{ pet.gender }}</p>
-        <p class="text-sm text-gray-700">Age: {{ pet.age }}</p>
-        <p class="text-sm text-gray-700">Personality: {{ pet.personality }}</p>
-      </div>
-      <div class="flex items-start justify-end p-2">
-        <span class="text-[#d55e00]">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
-            4.42 3 7.5 3c1.74 0 3.41 0.81 
-            4.5 2.09C13.09 3.81 14.76 3 
-            16.5 3 19.58 3 22 5.42 
-            22 8.5c0 3.78-3.4 6.86-8.55 
-            11.54L12 21.35z"/>
-          </svg>
-        </span>
-      </div>
-    </div>
-    {% endfor %}
+  <div class="mt-10 flex justify-between items-center">
+    <label><input type="checkbox" id="selectAll"> All</label>
+    <button onclick="submitAdoption()" class="bg-[#6d9f71] text-white px-6 py-2 rounded-full font-bold">Adopt</button>
   </div>
-
-  <div class="text-right mt-8">
-    <button class="bg-[#6d9f71] text-white px-6 py-2 rounded-xl text-lg">Adopt</button>
-  </div>
-
-  {% else %}
-  <p class="text-gray-600 text-center">You haven’t added any favorite pets yet.</p>
-  {% endif %}
 </div>
+
+<script>
+  async function loadFavorites() {
+    const ids = JSON.parse(localStorage.getItem("favorites") || "[]");
+    if (ids.length === 0) {
+      document.getElementById("favoritesContainer").innerHTML = "<p class='text-center text-gray-500'>No favorite pets selected.</p>";
+      return;
+    }
+
+    const res = await fetch(`/api/favorite-pets/?${ids.map(id => `ids[]=${id}`).join('&')}`);
+    const data = await res.json();
+    const container = document.getElementById("favoritesContainer");
+    container.innerHTML = "";
+
+    data.pets.forEach(pet => {
+      const html = `
+        <div class="flex gap-4 items-start bg-[#fefae0] rounded-xl shadow p-4">
+          <img src="${pet.image_url}" alt="${pet.name}" class="w-28 h-28 rounded-lg object-cover">
+          <div class="flex-grow">
+            <p class="font-bold">No. ${pet.pet_id}</p>
+            <p>Breed: ${pet.breed}</p>
+            <p>Gender: ${pet.gender}</p>
+            <p>Age: ${pet.age}</p>
+            <p>Personality: ${pet.personality}</p>
+          </div>
+          <div>
+            <input type="checkbox" class="selectPet" value="${pet.id}">
+          </div>
+        </div>
+      `;
+      container.innerHTML += html;
+    });
+  }
+
+  function submitAdoption() {
+    const selected = Array.from(document.querySelectorAll('.selectPet:checked')).map(el => el.value);
+    if (selected.length === 0) return alert("Please select at least one pet.");
+
+    // 🔁 redirect to adoption form with selected pets
+    window.location.href = `/request-adoption/?pets=${selected.join(',')}`;
+  }
+
+  document.getElementById("selectAll").addEventListener("change", function () {
+    document.querySelectorAll(".selectPet").forEach(el => el.checked = this.checked);
+  });
+
+  loadFavorites();
+</script>
 {% endblock %}

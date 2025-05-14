@@ -101,35 +101,119 @@
     </div>
 </div>
 
-<div class="text-center mb-10">
-    <div class="space-x-4">
-        
-        <a href="{% url 'donate' %}" class="bg-[#d99a56] text-white px-6 py-2 rounded-xl">Donate</a>
-    </div>
-</div>
 
-<!-- Care Support Section -->
-<div class="mt-20">
-    <h2 class="text-3xl font-bold text-center text-[#523a28] mb-6" style="font-family: 'Lexend', sans-serif;">
-      Support Daily Care
+<!-- Overview Donation Section -->
+<div class="mt-20 text-center px-6 py-12 bg-[#fdf3e3] rounded-3xl shadow-lg">
+    <h2 class="text-3xl font-bold text-[#c6302c] mb-4" style="font-family: 'Lexend', sans-serif;">
+      Make a difference today!
     </h2>
+    <p class="text-[#523a28] max-w-2xl mx-auto mb-6 text-sm md:text-base" style="font-family: 'Lexend', sans-serif;">
+      When you donate with PawPal, 100% of your donation goes toward helping animals in need.
+      Your contribution helps provide medical treatment, food, shelter, and love to stray dogs and cats.
+    </p>
   
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {% for pet in care_animals %}
-      <div class="bg-[#f1f9f2] rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
-        <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-56 object-cover">
-        <div class="p-4 text-left space-y-1" style="font-family: 'Lexend', sans-serif;">
-          <h3 class="text-xl font-semibold text-[#6d9f71]">{{ pet.name }}</h3>
-          <p class="text-sm text-gray-700 italic">Waiting for a home...</p>
-          <p class="text-sm text-gray-500">Your help keeps their tails wagging!</p>
-          <a href="{% url 'donate' %}" 
-             class="mt-3 inline-block bg-[#6d9f71] text-white text-center px-4 py-2 rounded-full font-semibold hover:bg-[#5a8861] transition">
-            Donate Food & Shelter
-          </a>
+    <!-- CTA Donate Now -->
+    <a href="{% url 'donate' %}" 
+    class="inline-block bg-[#d55e00] text-white px-8 py-3 rounded-full font-bold hover:bg-[#ba4a00] transition">
+    Donate ❤️
+    </a>
+  </div>
+
+
+  <!-- Section: Support Care for Our PawFriends -->
+<section class="mt-20">
+    <h2 class="text-2xl font-bold text-[#8d6e63] mb-6 text-center">Support Care for Our PawFriends</h2>
+    <div class="swiper supportSwiper px-4">
+      <div class="swiper-wrapper">
+        {% for pet in support_animals %}
+        <div class="swiper-slide">
+          <div class="relative bg-white rounded-xl shadow-md overflow-hidden group">
+            <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="h-48 w-full object-cover">
+            <div class="p-4 text-left">
+              <h3 class="font-bold text-lg text-[#523a28]">{{ pet.name }}</h3>
+              <p class="text-sm text-[#8d6e63] italic">{{ pet.breed }}</p>
+            </div>
+            <!-- Hover Overlay -->
+            <div class="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+              <button onclick="openSupportPopup({{ pet.id }}, '{{ pet.name }}')" class="bg-white text-[#6d9f71] px-4 py-2 rounded-full font-semibold shadow hover:bg-[#6d9f71] hover:text-white">Sponsor</button>
+            </div>
+          </div>
         </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+      <div class="swiper-button-next text-[#8d6e63]"></div>
+      <div class="swiper-button-prev text-[#8d6e63]"></div>
+    </div>
+  </section>
+  
+  <!-- Support Pop-up -->
+  <div id="supportPopup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden justify-center items-center">
+  <div class="bg-white p-6 rounded-xl max-w-md w-full relative">
+    <button onclick="closeSupportPopup()" class="absolute top-2 right-4 text-gray-500 hover:text-red-600 text-xl">&times;</button>
+    <h3 class="text-xl font-bold text-[#6d9f71] mb-4">Sponsor <span id="popupPetName"></span></h3>
+
+    <!-- Step 1: Fill amount -->
+    <input type="number" id="sponsorAmount" class="w-full mb-4 px-4 py-2 border rounded" placeholder="Enter amount (THB)">
+    <button onclick="showStaticQR()" class="w-full bg-[#6d9f71] text-white font-bold py-2 px-4 rounded-full">Continue</button>
+
+    <!-- Step 2: Show Static QR -->
+    <div id="qrSection" class="hidden mt-4 text-center">
+      <img src="{% static 'IMG_5331.JPG' %}" alt="PromptPay QR" class="w-48 mx-auto mb-4 rounded shadow">
+      <p class="text-sm text-gray-700 mb-2">Please transfer the amount shown above and upload payment slip.</p>
+      <input type="file" id="slipUpload" class="w-full mb-4">
+      <button onclick="confirmSupportDonation()" class="w-full bg-[#d55e00] text-white py-2 px-4 rounded-full">Confirm</button>
+    </div>
+
+    <!-- Step 3: Thank You -->
+    <div id="thankYouMessage" class="hidden text-center mt-4 text-[#6d9f71] font-semibold">
+      🙏 Thank you for your kindness!
     </div>
   </div>
+</div>
   
-{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+<script>
+  // 🌀 Swiper for Support Carousel
+  var swiper = new Swiper(".supportSwiper", {
+    slidesPerView: 1.2,
+    spaceBetween: 20,
+    loop: true,
+    breakpoints: {
+      640: { slidesPerView: 2 },
+      768: { slidesPerView: 3 },
+      1024: { slidesPerView: 4 },
+    },
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+  });
+
+  // 📌 เปิด popup + reset state
+  function openSupportPopup(petId, petName) {
+    document.getElementById('popupPetName').textContent = petName;
+    document.getElementById('sponsorAmount').value = '';
+    document.getElementById('supportPopup').classList.remove('hidden');
+    document.getElementById('qrSection').classList.add('hidden');
+    document.getElementById('thankYouMessage').classList.add('hidden');
+  }
+
+  function closeSupportPopup() {
+    document.getElementById('supportPopup').classList.add('hidden');
+  }
+
+  function showStaticQR() {
+    const amount = document.getElementById('sponsorAmount').value;
+    if (!amount) {
+      alert("Please enter amount");
+      return;
+    }
+    document.getElementById('qrSection').classList.remove('hidden');
+  }
+
+  function confirmSupportDonation() {
+    document.getElementById('qrSection').classList.add('hidden');
+    document.getElementById('thankYouMessage').classList.remove('hidden');
+  }
+</script>
+  {% endblock %}

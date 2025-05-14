@@ -1,4 +1,4 @@
 Django>=4.2
-gunicorn
 Pillow
 django-multiselectfield>=0.1.12
+qrcode

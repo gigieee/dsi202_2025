@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Medical Support - {{ sponsorship.pet.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10 px-6">
+  <!-- Animal Card -->
+  <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+    <div class="flex flex-col md:flex-row items-start gap-6">
+      <!-- Image -->
+      <img src="{{ sponsorship.pet.image.url }}" alt="{{ sponsorship.pet.name }}" class="w-full md:w-64 h-64 object-cover rounded-lg">
+
+      <!-- Info -->
+      <div class="flex-1 space-y-2">
+        <h2 class="text-2xl font-bold text-[#8d6e63]">No. {{ sponsorship.pet.pet_id }}</h2>
+        <p><strong>Hospital:</strong> Hachiko Hospital</p>
+        <p><strong>Breed:</strong> {{ sponsorship.pet.breed }}</p>
+        <p class="flex items-center">
+          <strong>Gender:</strong> {{ sponsorship.pet.gender|title }}
+          {% if sponsorship.pet.gender == "male" %}
+            <svg class="w-5 h-5 ml-2 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19 2h-4a1 1 0 1 0 0 2h1.586l-3.93 3.93a6.5 6.5 0 1 0 1.414 1.414L18 5.414V7a1 1 0 1 0 2 0V3a1 1 0 0 0-1-1z"/></svg>
+          {% else %}
+            <svg class="w-5 h-5 ml-2 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"/></svg>
+          {% endif %}
+        </p>
+        <p><strong>Age:</strong> {{ sponsorship.pet.get_age_in_years|floatformat:1 }} Years</p>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="mt-6">
+      <h3 class="text-lg font-semibold text-[#6d4c41] mb-1">Description of the condition</h3>
+      <p class="text-gray-700">{{ sponsorship.description }}</p>
+    </div>
+  </div>
+
+  <!-- Donation Form -->
+  <div class="bg-orange-50 rounded-xl shadow-md p-6">
+    <h3 class="text-xl font-bold mb-4 text-[#523a28]">Donation</h3>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-1">Amount (THB)</label>
+        <input type="number" name="amount" class="w-full border rounded px-4 py-2" placeholder="e.g. 200" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-1">Payment Method</label>
+        <div class="flex items-center gap-4">
+          <label class="flex items-center">
+            <input type="radio" name="payment_method" value="credit_card" required>
+            <span class="ml-2 bg-orange-300 text-white px-3 py-1 rounded">Credit Card</span>
+          </label>
+          <label class="flex items-center">
+            <input type="radio" name="payment_method" value="promptpay">
+            <img src="{% static 'promptpay.png' %}" alt="PromptPay" class="h-6 ml-2">
+          </label>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <input type="text" name="donor_name" placeholder="Full Name" class="w-full border rounded px-4 py-2" required>
+      </div>
+      <div class="mb-4">
+        <input type="email" name="email" placeholder="Email Address" class="w-full border rounded px-4 py-2" required>
+      </div>
+
+      <button type="submit" class="w-full bg-[#d55e00] hover:bg-[#b54800] text-white font-bold py-2 px-4 rounded-full">
+        Donate Now
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

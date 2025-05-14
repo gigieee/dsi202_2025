@@ -1,31 +1,82 @@
-<!-- templates/about.html -->
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}About Us - PawPal{% endblock %}
+
 {% block content %}
-<div class="max-w-4xl mx-auto py-10 px-4">
-  <h1 class="text-4xl font-bold text-[#6d9f71] mb-6">About Us</h1>
+<div class="bg-[#fffaf0] py-10 px-4 max-w-4xl mx-auto">
 
-  <p class="mb-4 text-gray-700 leading-relaxed">
-    PawPal is a community-driven project dedicated to rescuing and rehoming stray dogs and cats. Our mission is to provide second chances for abandoned animals through care, compassion, and connection with loving families.
-  </p>
+  <!-- Header -->
+  <h1 class="text-4xl font-bold text-center text-[#6d9f71] mb-8" style="font-family: 'Lexend', sans-serif;">About us</h1>
 
-  <p class="mb-4 text-gray-700 leading-relaxed">
-    We collaborate with volunteers, vets, and kind-hearted people across the country to ensure that no animal is left behind. Our platform makes it easy to explore adoptable pets, donate for medical treatments, or support through your time and voice.
-  </p>
-
-  <p class="mb-8 text-gray-700 leading-relaxed">
-    Whether you're here to adopt a furry friend or contribute to their well-being, PawPal welcomes you to be part of this life-saving journey. Together, we can make a lasting impact.
-  </p>
-
-  <div class="grid md:grid-cols-2 gap-6">
-    <div>
-      <h2 class="text-xl font-semibold mb-2 text-[#8d6e63]">Our Vision</h2>
-      <p class="text-gray-700">A world where every stray animal finds a home and a heart to belong to.</p>
+  <!-- What we do -->
+  <section class="mb-10">
+    <h2 class="text-xl font-bold text-[#333] mb-2">What we do ?</h2>
+    <div class="bg-[#fff3db] p-4 rounded-lg shadow text-center text-gray-700">
+      <p>At PawPal, we rescue, care for and rehome stray dogs and cats. We work with kind-hearted volunteers and loving adopters to give every furry friend a second chance at life.</p>
+      <p class="mt-4 text-[#dd6b20] font-semibold">From street to sofa — we’re here for every paw. 🐾</p>
     </div>
-    <div>
-      <h2 class="text-xl font-semibold mb-2 text-[#8d6e63]">Our Mission</h2>
-      <p class="text-gray-700">Rescue, treat, and rehome abandoned animals while educating communities on responsible pet care.</p>
+  </section>
+
+  <!-- Why we do -->
+  <section class="mb-12">
+    <h2 class="text-xl font-bold text-[#333] mb-2">Why we do ?</h2>
+    <div class="bg-[#fff3db] p-4 rounded-lg shadow text-gray-700">
+      <p>We believe every dog and cat deserves love, safety, and a place to call home. No paw should be left behind.</p>
+      <p class="mt-2">We do this because they can’t ask for help — but we can help them. 🧡</p>
     </div>
-  </div>
+  </section>
+
+  <!-- Hope in Numbers -->
+  <section class="text-center mb-12">
+    <h3 class="text-xl font-bold bg-[#ea907a] text-white px-6 py-2 rounded-full inline-block mb-6">Hope in Numbers</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-[#6d4c41] text-sm">
+
+      <div class="flex flex-col items-center">
+        <img src="{% static 'money.png' %}" class="w-10 mb-2" alt="Money">
+        <p class="font-bold text-xl">{{ donation_total|floatformat:0 }}</p>
+        <span>THB Donated</span>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <img src="{% static 'home.png' %}" class="w-10 mb-2" alt="Home">
+        <p class="font-bold text-xl">{{ adopted_count }}</p>
+        <span>Adopted</span>
+      </div>
+
+      <div class="flex flex-col items-center">
+        <img src="{% static 'pet.png' %}" class="w-10 mb-2" alt="Pet">
+        <p class="font-bold text-xl">{{ medical_count }}</p>
+        <span>Medical Pets</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog and Resources -->
+  <section>
+    <h3 class="text-2xl font-bold text-center text-[#4e6e4e] mb-6" style="font-family: 'Lexend', sans-serif;">Blog and Resources</h3>
+    <div class="grid md:grid-cols-3 gap-6">
+      <a href="{% url 'blog_detail' 1 %}" class="block bg-[#fffde8] rounded-xl overflow-hidden shadow hover:shadow-md transition">
+        <img src="{% static 'blog1.jpg' %}" class="w-full h-40 object-cover" />
+        <div class="p-4">
+          <p class="font-semibold text-[#d55e00]">ขนร่วงแบบนี้ปกติหรือพาไปหาหมอ</p>
+        </div>
+      </a>
+
+      <a href="{% url 'blog_detail' 2 %}" class="block bg-[#fffde8] rounded-xl overflow-hidden shadow hover:shadow-md transition">
+        <img src="{% static 'blog2.jpg' %}" class="w-full h-40 object-cover" />
+        <div class="p-4">
+          <p class="font-semibold text-[#8d6e63]">สัตว์เลี้ยงป่วยบ่อย ทำไงดี ?</p>
+        </div>
+      </a>
+
+      <a href="{% url 'blog_detail' 3 %}" class="block bg-[#fffde8] rounded-xl overflow-hidden shadow hover:shadow-md transition">
+        <img src="{% static 'blog3.jpg' %}" class="w-full h-40 object-cover" />
+        <div class="p-4">
+          <p class="font-semibold text-[#6d9f71]">5 พฤติกรรมที่บอกว่าน้องกำลังเครียด</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
 </div>
 {% endblock %}
