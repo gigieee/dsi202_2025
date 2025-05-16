@@ -4,3 +4,4 @@ django-multiselectfield>=0.1.12
 libscrc
 qrcode[pil]
 social-auth-app-django
+python-dotenv
