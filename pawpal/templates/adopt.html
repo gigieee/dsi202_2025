@@ -1,123 +1,386 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load query_filters %}
 
 {% block title %}Adopt - PawPal{% endblock %}
+{% block extra_head %}
+<style>
+  .timeline-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+  }
+
+  .timeline-item {
+    display: contents;
+  }
+
+  .timeline-circle {
+    grid-column: 1;
+    background-color: #d55e00;
+    color: white;
+    font-weight: bold;
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lexend', sans-serif;
+    position: relative;
+  }
+
+  .timeline-content {
+    grid-column: 2;
+    padding-bottom: 1rem;
+  }
+
+  .timeline-circle::after {
+    content: "";
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: calc(100% - 32px);
+    width: 2px;
+    background-color: #d55e00;
+  }
+
+  .timeline-item:last-child .timeline-circle::after {
+    display: none;
+  }
+
+  .step-circle {
+    background-color: #d55e00;
+    color: white;
+    font-weight: bold;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    font-family: 'Lexend', sans-serif;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 
 <div class="max-w-7xl mx-auto py-10 px-4">
-  <h1 class="text-4xl font-bold text-center text-[#523a28] mb-8" style="font-family: 'Lexend', sans-serif;">Meet Your New Best Friend</h1>
+  <h1 class="text-4xl font-bold text-center text-[#523a28] mb-10" style="font-family: 'Lexend', sans-serif;">Meet Your New Best Friend</h1>
 
-  <!-- Search & Filter -->
-  <form method="GET" class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <input type="text" name="q" placeholder="Search by name, breed, color, ID..." value="{{ request.GET.q }}" class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+  <!-- Layout: Sidebar + Content -->
 
-    <select name="species" class="w-full md:w-1/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
-      <option value="">All Species</option>
-      <option value="dog" {% if request.GET.species == 'dog' %}selected{% endif %}>Dog</option>
-      <option value="cat" {% if request.GET.species == 'cat' %}selected{% endif %}>Cat</option>
-    </select>
-
-    <button type="submit" class="bg-[#d55e00] text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-[#b54800] transition">Search</button>
-  </form>
-
-  <!-- Pet Cards Grid -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-    {% for pet in available_pets %}
-    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition relative cursor-pointer" onclick="openPetModal({{ pet.id }})">
-      <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-56 object-cover">
-      <div class="p-4">
-        <h3 class="text-xl font-bold text-[#6d4c41] mb-1">{{ pet.name }}</h3>
-        <p class="text-sm text-gray-600">Breed: {{ pet.breed }}</p>
-        <p class="text-sm text-gray-600">Color: {{ pet.color }}</p>
-        <p class="text-sm text-gray-600">ID: {{ pet.pet_id }}</p>
+  <div class="flex flex-col lg:flex-row gap-8 min-h-screen">
+    <!-- Sidebar Filter -->
+    <aside class="lg:w-1/4 bg-white rounded-lg shadow p-6 flex flex-col min-h-full">
+    <form method="GET" id="filterForm" class="space-y-4">
+      <!-- Search Box -->
+      <input type="text" name="q" placeholder="Search by name, breed, color, ID..." value="{{ request.GET.q }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300">
+  
+      <!-- Species -->
+      <div>
+        <label class="block font-semibold text-sm text-[#6d4c41] mb-1">Species</label>
+        <select name="species" onchange="this.form.submit()" class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm">
+            <option value="">All ({{ species_counts|get_item:'dog'|default:0|add:species_counts|get_item:'cat'|default:0 }})</option>
+            <option value="dog" {% if species == 'dog' %}selected{% endif %}>
+              Dog ({{ species_counts|get_item:'dog'|default:0 }})
+            </option>
+            <option value="cat" {% if species == 'cat' %}selected{% endif %}>
+              Cat ({{ species_counts|get_item:'cat'|default:0 }})
+            </option>
+        </select>
       </div>
-      <button onclick="event.stopPropagation(); toggleFavorite('{{ pet.id }}')" class="absolute top-2 right-2">
-        <svg id="heart-{{ pet.id }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-             stroke-width="1.5" stroke="currentColor"
-             class="w-7 h-7 transition duration-200"
-             style="color: gray;">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                   2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 
-                   4.5 2.09C13.09 3.81 14.76 3 
-                   16.5 3 19.58 3 22 5.42 22 8.5
-                   c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-        </svg>
-      </button>
+  
+      <!-- Breed -->
+      <div>
+        <label class="block font-semibold text-sm text-[#6d4c41] mb-1">Breed</label>
+        <input type="text" name="breed" value="{{ breed|default:'' }}" onchange="this.form.submit()" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+      </div>
+  
+      <!-- Size -->
+      <div>
+        <label class="block font-semibold text-sm text-[#6d4c41] mb-1">Size</label>
+        <select name="size" onchange="this.form.submit()" class="w-full px-3 py-2 border rounded">
+            <option value="">All</option>
+            <option value="small" {% if size == 'small' %}selected{% endif %}>
+              Small ({{ size_counts|get_item:'small'|default:0 }})
+            </option>
+            <option value="medium" {% if size == 'medium' %}selected{% endif %}>
+              Medium ({{ size_counts|get_item:'medium'|default:0 }})
+            </option>
+            <option value="large" {% if size == 'large' %}selected{% endif %}>
+              Large ({{ size_counts|get_item:'large'|default:0 }})
+            </option>
+            <option value="extra large" {% if size == 'extra large' %}selected{% endif %}>
+              Extra Large ({{ size_counts|get_item:'extra large'|default:0 }})
+            </option>
+        </select>
+      </div>
+  
+      <!-- Gender -->
+      <div>
+        <label class="block font-semibold text-sm text-[#6d4c41] mb-1">Gender</label>
+        <select name="gender" onchange="this.form.submit()" class="w-full px-3 py-2 border rounded">
+            <option value="">All</option>
+            <option value="male" {% if gender == 'male' %}selected{% endif %}>
+              Male ({{ gender_counts|get_item:'male'|default:0 }})
+            </option>
+            <option value="female" {% if gender == 'female' %}selected{% endif %}>
+              Female ({{ gender_counts|get_item:'female'|default:0 }})
+            </option>
+        </select>
+      </div>
+  
+      <!-- Color -->
+      <div>
+        <label class="block font-semibold text-sm text-[#6d4c41] mb-1">Color</label>
+        <select name="color" onchange="this.form.submit()" class="w-full px-3 py-2 border rounded">
+          <option value="">All</option>
+      {% for c in color_choices %}
+        <option value="{{ c }}" {% if color == c %}selected{% endif %}>
+          {{ c }} ({{ color_counts|get_item:c|default:0 }})
+        </option>
+      {% endfor %}
+        </select>
+      </div>
+  
+      <!-- Age -->
+      <div>
+        <label class="block font-semibold text-sm text-[#6d4c41] mb-1">Age</label>
+        <select name="age" onchange="this.form.submit()" class="w-full px-3 py-2 border rounded">
+          <option value="">All</option>
+          {% for age_option in age_choices %}
+            <option value="{{ age_option|lower }}" {% if age == age_option|lower %}selected{% endif %}>
+              {{ age_option }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+  
+  
+      <!-- Submit Button -->
+      <button type="submit" class="w-full bg-[#d55e00] text-white font-semibold px-4 py-2 rounded-lg hover:bg-[#b54800] transition">Apply Filters</button>
+    </form>
+</aside>
+
+<!-- Main Content -->
+<section class="flex-1 min-h-screen">
+    <!-- Filters Applied -->
+    {% if filters_applied %}
+  <div class="mb-4 text-sm text-gray-600 flex flex-wrap items-center gap-2">
+    <strong>Filters Applied:</strong>
+
+    {% if query %}
+      {% with request.GET.urlencode|remove_param:"q" as new_query %}
+        <a href="{% url 'adopt' %}?{{ new_query }}" class="bg-gray-200 px-2 py-1 rounded inline-flex items-center gap-1">
+          Search: {{ query }} <span class="text-gray-500 hover:text-red-500">✕</span>
+        </a>
+      {% endwith %}
+    {% endif %}
+    {% if species %}
+      {% with request.GET.urlencode|remove_param:"species" as new_query %}
+        <a href="{% url 'adopt' %}?{{ new_query }}" class="bg-gray-200 px-2 py-1 rounded inline-flex items-center gap-1">
+          Species: {{ species }} <span class="text-gray-500 hover:text-red-500">✕</span>
+        </a>
+      {% endwith %}
+    {% endif %}
+    {% if breed %}
+      {% with request.GET.urlencode|remove_param:"breed" as new_query %}
+        <a href="{% url 'adopt' %}?{{ new_query }}" class="bg-gray-200 px-2 py-1 rounded inline-flex items-center gap-1">
+          Breed: {{ breed }} <span class="text-gray-500 hover:text-red-500">✕</span>
+        </a>
+      {% endwith %}
+    {% endif %}
+    {% if size %}
+      {% with request.GET.urlencode|remove_param:"size" as new_query %}
+        <a href="{% url 'adopt' %}?{{ new_query }}" class="bg-gray-200 px-2 py-1 rounded inline-flex items-center gap-1">
+          Size: {{ size }} <span class="text-gray-500 hover:text-red-500">✕</span>
+        </a>
+      {% endwith %}
+    {% endif %}
+    {% if gender %}
+      {% with request.GET.urlencode|remove_param:"gender" as new_query %}
+        <a href="{% url 'adopt' %}?{{ new_query }}" class="bg-gray-200 px-2 py-1 rounded inline-flex items-center gap-1">
+          Gender: {{ gender }} <span class="text-gray-500 hover:text-red-500">✕</span>
+        </a>
+      {% endwith %}
+    {% endif %}
+    {% if color %}
+      {% with request.GET.urlencode|remove_param:"color" as new_query %}
+        <a href="{% url 'adopt' %}?{{ new_query }}" class="bg-gray-200 px-2 py-1 rounded inline-flex items-center gap-1">
+          Color: {{ color }} <span class="text-gray-500 hover:text-red-500">✕</span>
+        </a>
+      {% endwith %}
+    {% endif %}
+    {% if age %}
+      {% with request.GET.urlencode|remove_param:"age" as new_query %}
+        <a href="{% url 'adopt' %}?{{ new_query }}" class="bg-gray-200 px-2 py-1 rounded inline-flex items-center gap-1">
+          Age: {{ age|capfirst }} <span class="text-gray-500 hover:text-red-500">✕</span>
+        </a>
+      {% endwith %}
+    {% endif %}
+
+    <a href="{% url 'adopt' %}" class="ml-auto text-sm text-red-500 hover:underline">Clear All</a>
+  </div>
+  
+{% endif %}
+
+<!-- Sorting Dropdown: Float to Right -->
+<div class="flex justify-end mb-4">
+    <div class="flex items-center gap-2">
+      <label for="sortSelect" class="text-sm text-[#6d4c41] font-semibold">Sort By:</label>
+      <select id="sortSelect" name="sort" form="filterForm"
+              onchange="document.getElementById('filterForm').submit()" 
+              class="px-4 py-2 border rounded-lg shadow-sm">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest Addition</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest Addition</option>
+        <option value="random" {% if sort == 'random' %}selected{% endif %}>Random</option>
+      </select>
     </div>
+  </div>
+
+
+  <!-- Section: Pets Matching Filter -->
+  {% if filters_applied %}
+    <h2 class="text-2xl font-semibold text-[#6d4c41] mb-4">Your Filter Pets</h2>
+  {% endif %}
+
+  <!-- Pet Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for pet in available_pets %}
+      <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl hover:scale-[1.03] hover:border-4 hover:border-[#6d9f71] transition relative cursor-pointer" onclick="openPetModal({{ pet.id }})">
+        <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-56 object-cover">
+        <div class="p-3">
+            <!-- Name + Gender Row -->
+            <div class="flex justify-between items-center mb-1">
+              <h3 class="text-xl font-bold text-[#6d4c41]">{{ pet.name }}</h3>
+              
+              {% if pet.gender == "male" %}
+                <span title="Male" class="text-blue-500 text-xl">♂</span>
+              {% elif pet.gender == "female" %}
+                <span title="Female" class="text-pink-500 text-xl">♀</span>
+              {% else %}
+                <span class="text-gray-400 text-xl">?</span>
+              {% endif %}
+            </div>
+          
+            <!-- Other info -->
+            <p class="text-sm text-[#8d6e63]">ID: {{ pet.pet_id }}</p>
+            <p class="text-sm text-gray-600">Breed: {{ pet.breed }}</p>
+        </div>
+        <div class="px-3 pb-4">
+          <button onclick="openPetModal({{ pet.id }}); event.stopPropagation();" class="w-full bg-[#6d9f71] text-white font-semibold py-2 rounded-full hover:bg-[#5a8861] transition">View More</button>
+        </div>
+        <button onclick="event.stopPropagation(); toggleFavorite('{{ pet.id }}')" class="absolute top-2 right-2">
+          <svg id="heart-{{ pet.id }}" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke="white" class="w-8 h-8 transition duration-200" style="color: gray;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+               2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 
+               4.5 2.09C13.09 3.81 14.76 3 
+               16.5 3 19.58 3 22 5.42 22 8.5
+               c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+        </button>
+      </div>
     {% empty %}
-      <p class="text-gray-500 col-span-full text-center">No animals found.</p>
+      <p class="text-gray-500 col-span-full text-center">No Pets found.</p>
     {% endfor %}
   </div>
-</div>
 
-<!-- Pet Modal -->
-<div id="petModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex justify-center items-center">
-  <div class="bg-white rounded-2xl max-w-lg w-full p-6 relative">
-    <button onclick="closePetModal()" class="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-2xl">&times;</button>
-    <div id="petModalContent">
-      <!-- JS dynamically fills this -->
-    </div>
+  {% if filters_applied and all_pets %}
+  <h2 class="text-2xl font-semibold mt-10 mb-4 text-[#6d4c41]">Other Pets Also Available</h2>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    {% for pet in all_pets %}
+      <div class="relative bg-white rounded-xl shadow-md overflow-hidden cursor-pointer" onclick="openPetModal({{ pet.id }})">
+        
+        <!-- Heart Favorite Icon -->
+        <button onclick="event.stopPropagation(); toggleFavorite('{{ pet.id }}')" class="absolute top-2 right-2">
+          <svg id="heart-{{ pet.id }}" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+               viewBox="0 0 24 24" stroke-width="2.5" stroke="white"
+               class="w-8 h-8 transition duration-200" style="color: gray;">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                  2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 
+                  4.5 2.09C13.09 3.81 14.76 3 
+                  16.5 3 19.58 3 22 5.42 22 8.5
+                  c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+        </button>
+
+        <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-48 object-cover">
+        <div class="p-2">
+            <div class="flex justify-between items-center mb-1">
+                <p class="text-xl font-bold text-[#6d4c41]">{{ pet.name }}</p>
+                {% if pet.gender == "male" %}
+                  <span title="Male" class="text-blue-500 text-xl">♂</span>
+                {% elif pet.gender == "female" %}
+                  <span title="Female" class="text-pink-500 text-xl">♀</span>
+                {% else %}
+                  <span title="Unknown" class="text-gray-400 text-xl">?</span>
+                {% endif %}
+              </div>
+
+          <p class="text-sm text-[#8d6e63]">ID: {{ pet.pet_id }}</p>
+        </div>
+        
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
+  <!-- Recently Viewed -->
+<div id="recentlyViewedSection">
+    {% if recently_viewed %}
+      <h2 class="text-2xl font-semibold mt-12 mb-4 text-[#6d4c41]">Recently Viewed Pets</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {% for pet in recently_viewed %}
+          <div class="relative bg-white rounded-xl shadow-md overflow-hidden cursor-pointer" onclick="openPetModal({{ pet.id }})">
+            
+            <!-- Heart Favorite Icon -->
+            <button onclick="event.stopPropagation(); toggleFavorite('{{ pet.id }}')" class="absolute top-2 right-2">
+              <svg id="heart-{{ pet.id }}" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                   viewBox="0 0 24 24" stroke-width="2.5" stroke="white"
+                   class="w-8 h-8 transition duration-200" style="color: gray;">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                      2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 
+                      4.5 2.09C13.09 3.81 14.76 3 
+                      16.5 3 19.58 3 22 5.42 22 8.5
+                      c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </button>
+  
+            <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-48 object-cover">
+  
+            <div class="p-2">
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xl font-bold text-[#6d4c41]">{{ pet.name }}</p>
+                    {% if pet.gender == "male" %}
+                      <span title="Male" class="text-blue-500 text-xl">♂</span>
+                    {% elif pet.gender == "female" %}
+                      <span title="Female" class="text-pink-500 text-xl">♀</span>
+                    {% else %}
+                      <span title="Unknown" class="text-gray-400 text-xl">?</span>
+                    {% endif %}
+                  </div>
+
+              <p class="text-sm text-[#8d6e63]">ID: {{ pet.pet_id }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
   </div>
 </div>
+{% endblock %}
 
-<!-- Favorite JS (localStorage) -->
-<script>
-  function toggleFavorite(petId) {
-    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    const index = favorites.indexOf(petId);
-    if (index > -1) {
-      favorites.splice(index, 1);
-    } else {
-      favorites.push(petId);
-    }
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-    updateHeartIcons();
-  }
-
-  function updateHeartIcons() {
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    document.querySelectorAll("[id^='heart-']").forEach(el => {
-      const petId = el.id.replace("heart-", "");
-      el.style.color = favorites.includes(petId) ? "#e53935" : "gray";
-    });
-  }
-
-  function openPetModal(petId) {
-    fetch(`/api/pet/${petId}/`)  // backend endpoint to return pet JSON
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('petModalContent').innerHTML = `
-          <div class="text-center">
-            <img src="${data.image_url}" alt="${data.name}" class="w-40 h-40 object-cover mx-auto mb-4 rounded-xl">
-            <h3 class="text-2xl font-bold text-[#6d4c41]">${data.name}</h3>
-            <p class="text-sm text-gray-600">Breed: ${data.breed}</p>
-            <p class="text-sm text-gray-600">Color: ${data.color}</p>
-            <p class="text-sm text-gray-600">Age: ${data.age} ${data.age_unit}</p>
-            <p class="text-sm text-gray-600 mb-2">ID: ${data.pet_id}</p>
-            <p class="text-sm text-gray-800 mb-4">${data.story}</p>
-            ${data.is_medical ? `
-              <div class="mb-4">
-                <div class="w-full bg-gray-200 h-2 rounded-full">
-                  <div class="bg-[#6d9f71] h-2 rounded-full" style="width: ${data.progress}%"></div>
-                </div>
-                <p class="text-xs text-gray-600 mt-1">Medical Help: ${data.progress}% funded</p>
-                <p class="text-xs text-red-600">${data.medical_description}</p>
-              </div>
-            ` : ''}
-            <button onclick="closePetModal()" class="mt-4 px-6 py-2 bg-[#d55e00] text-white rounded-full">Close</button>
-          </div>
-        `;
-        document.getElementById('petModal').classList.remove('hidden');
-      });
-  }
-
-  function closePetModal() {
-    document.getElementById('petModal').classList.add('hidden');
-  }
-
-  document.addEventListener("DOMContentLoaded", updateHeartIcons);
-</script>
-
+{% block extra_js %}
+<script src="{% static 'js/modal.js' %}"></script>
 {% endblock %}

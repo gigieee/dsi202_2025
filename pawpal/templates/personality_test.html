@@ -1,49 +1,84 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Personality Test - PawPal{% endblock %}
 {% block content %}
 <div class="bg-gray-50 min-h-[80vh] py-12 px-4">
   <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-8">
-    <h1 class="text-2xl font-bold text-[#6d9f71] mb-6 text-center">🐾 แบบทดสอบบุคลิกภาพของคุณ</h1>
+    <h1 class="text-2xl font-bold text-[#6d9f71] mb-6 text-center">🐾 Find Your PawPal Match</h1>
     <form method="post">
       {% csrf_token %}
 
       <!-- Question 1 -->
       <div class="mb-6">
-        <label class="block text-gray-700 font-medium mb-2">1. วันหยุดที่คุณชอบคือแบบไหน?</label>
+        <label class="block text-gray-700 font-medium mb-2">1. What kind of weekend do you prefer?</label>
         <select name="q1" required class="w-full border rounded px-3 py-2">
-          <option value="">-- เลือกคำตอบ --</option>
-          <option value="adventure">ผจญภัย/ลุยธรรมชาติ</option>
-          <option value="relax">นั่งชิล/นอนพัก</option>
-          <option value="social">เจอเพื่อน/ปาร์ตี้</option>
+          <option value="">-- Select an answer --</option>
+          <option value="relax">Staying home and relaxing</option>
+          <option value="adventure">Going on an adventure</option>
+          <option value="social">Spending time with family or friends</option>
+          <option value="hobbies">Catching up on hobbies</option>
         </select>
       </div>
 
       <!-- Question 2 -->
       <div class="mb-6">
-        <label class="block text-gray-700 font-medium mb-2">2. คุณนิยามตัวเองว่าอย่างไร?</label>
+        <label class="block text-gray-700 font-medium mb-2">2. How would your friends describe you?</label>
         <select name="q2" required class="w-full border rounded px-3 py-2">
-          <option value="">-- เลือกคำตอบ --</option>
-          <option value="introvert">เงียบขรึม</option>
-          <option value="extrovert">ชอบเข้าสังคม</option>
-          <option value="balanced">สมดุล</option>
+          <option value="">-- Select an answer --</option>
+          <option value="playful">Energetic and playful</option>
+          <option value="calm">Calm and thoughtful</option>
+          <option value="loyal">Loyal and dependable</option>
+          <option value="independent">Independent and quiet</option>
         </select>
       </div>
 
       <!-- Question 3 -->
       <div class="mb-6">
-        <label class="block text-gray-700 font-medium mb-2">3. สไตล์การใช้ชีวิตของคุณ?</label>
+        <label class="block text-gray-700 font-medium mb-2">3. What's your ideal living environment?</label>
         <select name="q3" required class="w-full border rounded px-3 py-2">
-          <option value="">-- เลือกคำตอบ --</option>
-          <option value="active">กระฉับกระเฉง</option>
-          <option value="calm">เรียบง่าย/นิ่ง</option>
-          <option value="mixed">แล้วแต่อารมณ์</option>
+          <option value="">-- Select an answer --</option>
+          <option value="yard">A spacious home with a yard</option>
+          <option value="apartment">A cozy apartment in the city</option>
+          <option value="peaceful">Somewhere peaceful and quiet</option>
+          <option value="travel">Always traveling and exploring</option>
+        </select>
+      </div>
+
+      <!-- Question 4 -->
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-2">4. How do you deal with stress?</label>
+        <select name="q4" required class="w-full border rounded px-3 py-2">
+          <option value="">-- Select an answer --</option>
+          <option value="nap">Take a nap or relax</option>
+          <option value="talk">Talk to someone I trust</option>
+          <option value="exercise">Go outside or get active</option>
+          <option value="focus">Focus on work or hobbies</option>
+        </select>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="mb-6">
+        <label class="block text-gray-700 font-medium mb-2">5. Which of these values best describes you?</label>
+        <select name="q5" required class="w-full border rounded px-3 py-2">
+          <option value="">-- Select an answer --</option>
+          <option value="affection">Love and affection</option>
+          <option value="freedom">Freedom and independence</option>
+          <option value="responsibility">Responsibility and commitment</option>
+          <option value="fun">Fun and excitement</option>
         </select>
       </div>
 
       <button type="submit" class="bg-[#6d9f71] text-white font-semibold px-6 py-2 rounded hover:bg-[#5a8661] transition">
-        ส่งคำตอบ
+        Submit Answers
       </button>
     </form>
   </div>
 </div>
+
+{% block extra_js %}
+<script>
+    const isLoggedIn = {{ user.is_authenticated|yesno:"true,false" }};
+</script>
+<script src="{% static 'js/personality_test.js' %}"></script>
+{% endblock %}
 {% endblock %}

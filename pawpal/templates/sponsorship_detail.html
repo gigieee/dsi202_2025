@@ -3,73 +3,176 @@
 {% block title %}Medical Support - {{ sponsorship.pet.name }}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-10 px-6">
-  <!-- Animal Card -->
-  <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-    <div class="flex flex-col md:flex-row items-start gap-6">
-      <!-- Image -->
-      <img src="{{ sponsorship.pet.image.url }}" alt="{{ sponsorship.pet.name }}" class="w-full md:w-64 h-64 object-cover rounded-lg">
 
-      <!-- Info -->
-      <div class="flex-1 space-y-2">
-        <h2 class="text-2xl font-bold text-[#8d6e63]">No. {{ sponsorship.pet.pet_id }}</h2>
-        <p><strong>Hospital:</strong> Hachiko Hospital</p>
+<div class="mb-6">
+    <a href="{% url 'donate' %}" class="inline-block bg-[#d55e00] hover:bg-[#b54800] text-white font-semibold py-2 px-4 rounded-full shadow">
+        ← Back to Donate Page
+      </a>
+  </div>
+<div class="max-w-5xl mx-auto py-10 px-6">
+  <!-- Animal Detail Section -->
+  <div class="grid md:grid-cols-2 gap-8 mb-10">
+    <!-- Left: Image + Info -->
+    <div>
+      <img src="{{ sponsorship.pet.image.url }}" alt="{{ sponsorship.pet.name }}" class="w-full h-64 object-cover rounded-xl mb-4">
+      <div class="bg-white p-4 rounded-xl shadow space-y-2">
+        <h2 class="text-xl font-bold text-[#6d4c41]">No. {{ sponsorship.pet.pet_id }} – {{ sponsorship.pet.name }}</h2>
         <p><strong>Breed:</strong> {{ sponsorship.pet.breed }}</p>
         <p class="flex items-center">
-          <strong>Gender:</strong> {{ sponsorship.pet.gender|title }}
+          <strong>Gender:</strong>
           {% if sponsorship.pet.gender == "male" %}
-            <svg class="w-5 h-5 ml-2 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19 2h-4a1 1 0 1 0 0 2h1.586l-3.93 3.93a6.5 6.5 0 1 0 1.414 1.414L18 5.414V7a1 1 0 1 0 2 0V3a1 1 0 0 0-1-1z"/></svg>
+            <span class="text-blue-600 ml-1">♂ Male</span>
           {% else %}
-            <svg class="w-5 h-5 ml-2 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"/></svg>
+            <span class="text-pink-500 ml-1">♀ Female</span>
           {% endif %}
         </p>
         <p><strong>Age:</strong> {{ sponsorship.pet.get_age_in_years|floatformat:1 }} Years</p>
       </div>
     </div>
 
-    <!-- Description -->
-    <div class="mt-6">
-      <h3 class="text-lg font-semibold text-[#6d4c41] mb-1">Description of the condition</h3>
-      <p class="text-gray-700">{{ sponsorship.description }}</p>
+    <!-- Right: Condition Description + Progress + Donation -->
+    <div>
+      <h3 class="text-lg font-semibold text-[#6d4c41] mb-2">Description of the condition</h3>
+      <p class="text-gray-700 mb-4">{{ sponsorship.description }}</p>
+
+      <!-- Progress Bar -->
+      <div class="mb-6">
+        <p class="text-sm text-gray-600 mb-1">Goal: ฿{{ sponsorship.goal_amount|floatformat:0 }}</p>
+        <div class="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
+          <div class="h-4 bg-[#6d9f71]" style="width: {{ sponsorship.get_progress_percent }}%;"></div>
+        </div>
+        <p class="text-xs text-right text-gray-500 mt-1">{{ sponsorship.get_progress_percent }}% funded</p>
+      </div>
+
+      <!-- Donation Box -->
+      <div class="bg-orange-50 p-5 rounded-xl shadow">
+        <h4 class="text-lg font-bold mb-3 text-[#523a28]">Support Them</h4>
+        <form id="medDonationForm">
+          <input type="hidden" id="sponsorshipId" value="{{ sponsorship.id }}">
+          <input type="text" id="donorName" placeholder="Full Name" class="w-full border rounded px-4 py-2 mb-2" required>
+          <input type="email" id="email" placeholder="Email Address" class="w-full border rounded px-4 py-2 mb-2" required>
+          <input type="number" id="donationAmount" placeholder="Amount (THB)" class="w-full border rounded px-4 py-2 mb-4" required>
+          <button type="button" onclick="openMedPopup({{ sponsorship.id }})" class="bg-[#d55e00] hover:bg-[#b54800] text-white font-bold py-2 px-4 w-full rounded-full">
+            Donate Now
+          </button>
+        </form>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- Donation Form -->
-  <div class="bg-orange-50 rounded-xl shadow-md p-6">
-    <h3 class="text-xl font-bold mb-4 text-[#523a28]">Donation</h3>
+<!-- Medical Donation Popup -->
+<div id="medDonatePopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
+  <div class="bg-white p-6 rounded-xl max-w-lg w-full relative shadow-lg">
+    <button onclick="closeMedPopup()" class="absolute top-2 right-4 text-gray-500 hover:text-red-600 text-xl">&times;</button>
 
-    <form method="POST">
-      {% csrf_token %}
-      <div class="mb-4">
-        <label class="block text-gray-700 mb-1">Amount (THB)</label>
-        <input type="number" name="amount" class="w-full border rounded px-4 py-2" placeholder="e.g. 200" required>
-      </div>
+    <!-- Step 1: QR Display -->
+    <div id="medStep1">
+      <h3 class="text-2xl font-bold text-center text-[#523a28] mb-4">Scan to Donate with PromptPay</h3>
+      <div id="medQrImageContainer" class="mb-4 text-center"></div>
+      <p class="text-sm text-gray-600 text-center">You have <span id="medCountdown">05:00</span> minutes to complete payment</p>
+      <input type="file" id="slipImage" accept="image/*" class="mt-4 w-full">
+      <button onclick="submitMedicalDonation({{ sponsorship.id }})" class="bg-[#d55e00] text-white font-bold px-6 py-2 mt-6 rounded-full w-full">Confirm Donation</button>
+    </div>
 
-      <div class="mb-4">
-        <label class="block text-gray-700 mb-1">Payment Method</label>
-        <div class="flex items-center gap-4">
-          <label class="flex items-center">
-            <input type="radio" name="payment_method" value="credit_card" required>
-            <span class="ml-2 bg-orange-300 text-white px-3 py-1 rounded">Credit Card</span>
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="payment_method" value="promptpay">
-            <img src="{% static 'promptpay.png' %}" alt="PromptPay" class="h-6 ml-2">
-          </label>
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <input type="text" name="donor_name" placeholder="Full Name" class="w-full border rounded px-4 py-2" required>
-      </div>
-      <div class="mb-4">
-        <input type="email" name="email" placeholder="Email Address" class="w-full border rounded px-4 py-2" required>
-      </div>
-
-      <button type="submit" class="w-full bg-[#d55e00] hover:bg-[#b54800] text-white font-bold py-2 px-4 rounded-full">
-        Donate Now
-      </button>
-    </form>
+    <!-- Step 2: Thank You -->
+    <div id="medStep2" class="hidden text-center">
+        <h3 class="text-2xl font-bold text-[#6d9f71] mb-4">Thank You!</h3>
+        <p class="text-gray-700">Your support means the world to our furry friends ❤️</p>
+        <button onclick="closeMedPopup()" class="mt-4 bg-gray-300 hover:bg-gray-400 px-6 py-2 rounded-full">Close</button>
+  </div>
   </div>
 </div>
+
+<script>
+  let medTimerInterval;
+  function openMedPopup(sponsorshipId) {
+    document.getElementById('medDonatePopup').classList.remove('hidden');
+    document.getElementById('medStep1').classList.remove('hidden');
+    document.getElementById('medStep2').classList.add('hidden');
+
+    const amount = document.getElementById("donationAmount").value;
+    fetch(`/generate-promptpay-qr/?amount=${amount}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("medQrImageContainer").innerHTML = `
+          <img src="data:image/png;base64,${data.qr}" class="w-40 mx-auto" />
+        `;
+      });
+    startMedCountdown(5 * 60);
+  }
+
+  function closeMedPopup() {
+    document.getElementById('medDonatePopup').classList.add('hidden');
+    clearInterval(medTimerInterval);
+  }
+
+  function startMedCountdown(seconds) {
+    let remaining = seconds;
+    medTimerInterval = setInterval(() => {
+      const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
+      const secs = String(remaining % 60).padStart(2, '0');
+      document.getElementById('medCountdown').textContent = `${minutes}:${secs}`;
+      if (--remaining < 0) {
+        clearInterval(medTimerInterval);
+        document.getElementById('medCountdown').textContent = "Expired";
+      }
+    }, 1000);
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function submitMedicalDonation(sponsorshipId) {
+  const formData = new FormData();
+  formData.append("donor_name", document.getElementById("donorName").value); // ✅ ตรงกับ input
+  formData.append("email", document.getElementById("email").value);
+  formData.append("amount", document.getElementById("donationAmount").value);
+  formData.append("slip_image", document.getElementById("slipImage").files[0]);
+
+  fetch(`/donate/medical/${sponsorshipId}/`, {
+    method: "POST",
+    body: formData,
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken")
+    }
+  })
+  .then(res => {
+    if (res.ok) {
+      console.log("✅ Donation submitted successfully.");
+      showMedThankYouAndReload();
+    } else {
+        return res.json().then(data => {
+      console.error("❌ Error:", data);
+      alert("❌ Failed to process donation\n" + data.error);
+    });
+    }
+  })
+  .catch(err => alert("❌ Unexpected error: " + err));
+}
+
+function showMedThankYouAndReload() {
+  clearInterval(medTimerInterval);
+  document.getElementById('medStep1').classList.add('hidden');
+  document.getElementById('medStep2').classList.remove('hidden');
+
+  // ✅ Reload หน้าเว็บหลังจาก 2 วินาที เพื่อให้ progress bar อัปเดต
+  setTimeout(() => {
+    window.location.reload();
+  }, 2000);
+}
+</script>
+
 {% endblock %}

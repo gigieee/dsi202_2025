@@ -24,7 +24,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-    <style>
+    
+<style>
 
     /* Font */
     
@@ -309,9 +310,9 @@
         50% { transform: scale(1.1); }
         100% { transform: scale(1); }
     }
-    </style>
+</style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body {% if user.is_authenticated %}data-logged-in="true"{% endif %} class="flex flex-col min-h-screen">
 
     <!-- Navbar -->
     <nav class="bg-white shadow-md sticky top-0 z-50 text-[#8d6e63]">
@@ -327,6 +328,7 @@
             </a>
 
           <!-- Hamburger button (mobile only) -->
+
           <button class="md:hidden text-[#8d6e63] focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -334,8 +336,9 @@
           </button>
       
           <!-- Center: Menu (desktop) -->
+
           <div class="hidden md:flex items-center space-x-6 text-sm md:text-base font-medium">
-            <a href="{% url 'homepage' %}" class="hover:bg-[#8d6e63] hover:text-white px-3 py-5 rounded transition">Home</a>
+            <a href="{% url 'homepage' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">Home</a>
             <a href="{% url 'adopt' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">Adopt</a>
             <a href="{% url 'donate' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">Donate</a>
             <a href="{% url 'about' %}" class="hover:bg-[#d99a56] hover:text-white px-3 py-5 rounded transition">About Us</a>
@@ -343,34 +346,51 @@
       
           <!-- Right: Icons -->
           <div class="hidden md:flex items-center space-x-4">
+
             <!-- Favorite Icon -->
             <a href="{% url 'favorites' %}" class="group transition duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"
-                     class="w-10 h-10 transition duration-200">
-                  
-                  <!-- บ้าน (มีขอบ) -->
-                  <path d="M8 28 L32 8 L56 28 V56 H36 V40 H28 V56 H8 Z"
-                        fill="#d99a56" stroke="#5a463e" stroke-width="2"
-                        class="group-hover:fill-[#c6302c] transition" />
-                  
-                  <!-- หัวใจใหญ่กลางบ้าน (มีขอบ) -->
-                  <path d="M32 32 
-                           C28 28, 22 28, 22 34 
-                           C22 40, 32 46, 32 46 
-                           C32 46, 42 40, 42 34 
-                           C42 28, 36 28, 32 32 Z"
-                        fill="#c6302c" stroke="#a62826" stroke-width="1.5"
-                        class="group-hover:fill-[#d99a56] transition" />
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"
+                class="w-10 h-10 transition duration-200">
+                <path d="M8 28 L32 8 L56 28 V56 H36 V40 H28 V56 H8 Z"
+                    fill="#d99a56" stroke="#5a463e" stroke-width="2"
+                    class="group-hover:fill-[#c6302c] transition" />
+                <path d="M32 32 
+                        C28 28, 22 28, 22 34 
+                        C22 40, 32 46, 32 46 
+                        C32 46, 42 40, 42 34 
+                        C42 28, 36 28, 32 32 Z"
+                    fill="#c6302c" stroke="#a62826" stroke-width="1.5"
+                    class="group-hover:fill-[#d99a56] transition" />
+              </svg>
             </a>
-            <!-- Profile icon -->
-             <a href="{% url 'login' %}" class="text-[#8d6e63] hover:text-[#c6302c]">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
+
+            <div class="relative group">
+                <button class="text-[#8d6e63] hover:text-[#6d9f71]" onclick="toggleProfileDropdown()" title="Profile">
+                  <!-- Profile Icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
-                </svg>
-            </a>
-          </div>
-        </div>
+                  </svg>
+                </button>
+              
+                <!-- Dropdown Menu -->
+                <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg hidden z-50">
+                  {% if user.is_authenticated %}
+                    <a href="{% url 'user_dashboard' %}" class="block px-4 py-2 hover:bg-gray-100">My Dashboard</a>
+                    <a href="{% url 'notifications' %}" class="block px-4 py-2 hover:bg-gray-100">Notifications</a>
+                    <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+                  {% else %}
+                    <a href="{% url 'login' %}" class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
+                        Login
+                    </a>
+                    <a href="{% url 'signup' %}" class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100">
+                        Sign Up
+                    </a>
+                  {% endif %}
+                </div>
+            </div>
+        
+            
+
         <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden hidden px-4 pb-4">
             <a href="{% url 'homepage' %}" class="block py-2 text-[#8d6e63] hover:bg-[#8d6e63] hover:text-white rounded-md px-3">Home</a>
@@ -392,6 +412,16 @@
             </div>
         </div>
     </nav>
+
+    {% if messages %}
+    <div class="max-w-xl mx-auto mt-4">
+    {% for message in messages %}
+        <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-4 text-sm shadow">
+        {{ message }}
+        </div>
+    {% endfor %}
+    </div>
+    {% endif %}
 
     <!-- Page Content -->
     <main class="container mx-auto px-4 py-8">
@@ -416,27 +446,17 @@
             <div class="footer-section">
                 <h3>Contact</h3>
                 <div class="contact-info">
-                    <p>Email: info@pawpal.com</p>
-                    <p>Phone: +123 456 7890</p>
-                    <p>Address: 123 Main St, City, State, Zip</p>
+                    <p>Email: angiesang53@pawpal.com</p>
+                    <p>Phone: +6687 491 9999</p>
+                    <p>Address: Pathumthani </p>
                 </div>
             </div>
             <div class="footer-section">
                 <h3>Get Involved</h3>
                 <ul>
-                    <li><a href="#">Adopt</a></li>
-                    <li><a href="#">Foster</a></li>
-                    <li><a href="#">Donate</a></li>
-                    <li><a href="#">Volunteer</a></li>
+                    <li><a href="{% url 'adopt' %}" >Adopt</a></li>
+                    <li><a href="{% url 'donate' %}" >Donate</a></li>
                 </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <div class="social-icons">
-                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                </div>
             </div>
         </div>
         <div class="copyright">
@@ -444,5 +464,41 @@
         </div>
     </footer>
 
+  <!-- Pet Modal (Global Use) -->
+  <div id="petModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-center items-center">
+    <div id="petModalContent" class="bg-white rounded-lg max-w-xl w-full p-6 relative">
+      <button onclick="closePetModal()" class="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-2xl">&times;</button>
+      <div id="petDetailContent">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Link JS Modal -->
+  <script src="{% static 'js/modal.js' %}"></script>
+  <script>
+    function toggleProfileDropdown() {
+      const dropdown = document.getElementById('profileDropdown');
+      dropdown.classList.toggle('hidden');
+    }
+  
+    document.addEventListener('click', function (event) {
+      const dropdown = document.getElementById('profileDropdown');
+      const button = event.target.closest('button');
+      if (!dropdown.contains(event.target) && !button) {
+        dropdown.classList.add('hidden');
+      }
+    });
+  </script>
+  {% if user.is_authenticated %}
+  <script>
+  fetch('/api/favorite-pets/')
+    .then(res => res.json())
+    .then(data => {
+      const ids = data.pets.map(p => String(p.id));
+      localStorage.setItem("favorites", JSON.stringify(ids));
+      updateHeartIcons();
+    });
+  </script>
+  {% endif %}
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

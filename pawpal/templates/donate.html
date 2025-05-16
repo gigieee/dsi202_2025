@@ -106,7 +106,6 @@
 <div id="donatePopup" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
     <div class="bg-white p-6 rounded-xl max-w-lg w-full relative shadow-lg">
 
-        <input type="hidden" id="csrfToken" value="{% csrf_token %}">
   
       <button onclick="closePopup()" class="absolute top-2 right-4 text-gray-500 hover:text-red-600 text-xl">&times;</button>
   
@@ -115,11 +114,8 @@
         <h3 class="text-2xl font-bold text-center text-[#523a28] mb-4">Donor Information</h3>
         <input type="text" id="donorName" placeholder="Full Name" class="w-full border rounded px-4 py-2 mb-3" required>
         <input type="email" id="email" placeholder="Email" class="w-full border rounded px-4 py-2 mb-3" required>
-        <select id="paymentMethod" class="w-full border rounded px-4 py-2 mb-3" required>
-          <option value="">Select Payment Method</option>
-          <option value="promptpay">PromptPay</option>
-          <option value="credit_card">Credit Card</option>
-        </select>
+        <p class="text-sm mb-2 text-gray-700">Payment Method: <strong>PromptPay</strong></p>
+        <input type="hidden" id="paymentMethod" value="promptpay">
         <textarea id="message" rows="2" placeholder="Message (optional)" class="w-full border rounded px-4 py-2 mb-4"></textarea>
         <button onclick="goToStep2()" class="bg-[#6d9f71] text-white px-6 py-2 rounded-full w-full font-bold hover:bg-[#51865b]">Continue</button>
       </div>
@@ -161,29 +157,25 @@
     }
   
     function goToStep2() {
-      const method = document.getElementById("paymentMethod").value;
-      const amount = document.getElementById("donationAmount").value;
-  
-      if (!method || !amount) {
-        alert("Please fill out all required fields.");
-        return;
-      }
-  
-      document.getElementById('step1').classList.add('hidden');
-      document.getElementById('step2').classList.remove('hidden');
-  
-      if (method === "promptpay") {
+        const amount = document.getElementById("donationAmount").value;
+        if (!amount) {
+            alert("Please enter a donation amount.");
+            return;
+        }
+
+        document.getElementById('step1').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+
         fetch(`/generate-promptpay-qr/?amount=${amount}`)
-          .then(res => res.json())
-          .then(data => {
+            .then(res => res.json())
+            .then(data => {
             document.getElementById("qrImageContainer").innerHTML = `
-              <img src="data:image/png;base64,${data.qr}" class="w-40 mx-auto" />
-            `;
-          });
-  
-        startCountdown(5 * 60);  // 5 minutes countdown
-      }
-    }
+                <img src="data:image/png;base64,${data.qr}" class="w-40 mx-auto" />
+                `;
+            });
+
+        startCountdown(5 * 60);
+        }
   
     function submitDonation() {
       const formData = new FormData();
@@ -194,14 +186,20 @@
       formData.append("message", document.getElementById("message").value);
       formData.append("slip_image", document.getElementById("slipImage").files[0]);
   
-      fetch("{% url 'general_donate' %}", {
+      fetch("/donate/general/", {
         method: "POST",
         headers: {
-            "X-CSRFToken": document.getElementById("csrfToken").value 
-            },
-            body: formData,
-        })
-        .then(res => res.ok ? showStep3() : alert("Error processing your donation"));
+            "X-CSRFToken": csrftoken  // ✅ ใช้จาก cookie
+        },
+        body: formData
+    })
+        .then(res => {
+        if (res.ok) {
+            showStep3();
+        } else {
+            res.json().then(data => alert("❌ " + data.error));
+        }
+    });
     }
   
     function showStep3() {
@@ -222,6 +220,23 @@
         }
       }, 1000);
     }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // ตรวจว่า cookie เริ่มด้วยชื่อที่ต้องการ
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie("csrftoken");
   </script>
   
 

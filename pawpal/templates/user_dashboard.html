@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}My Dashboard - PawPal{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-10">
+  <h2 class="text-3xl font-bold text-[#523a28] mb-8">Welcome, {{ user.username }} ✨</h2>
+
+  <!-- Section: Personality Test -->
+  <div class="mb-10">
+    <h3 class="text-xl font-semibold text-[#6d9f71] mb-3">🧠 Personality Test Result</h3>
+    {% if personality_result %}
+      <p class="bg-white p-4 rounded shadow text-[#523a28]">{{ personality_result.result_summary }}</p>
+    {% else %}
+      <p class="text-gray-600">You haven't taken the test yet. <a href="{% url 'personality_test' %}" class="text-[#d55e00] underline">Take it now</a></p>
+    {% endif %}
+  </div>
+
+  <!-- Section: Favorites -->
+  <div class="mb-10">
+    <h3 class="text-xl font-semibold text-[#d55e00] mb-3">❤️ Favorite Pets</h3>
+    {% if favorite_pets %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {% for pet in favorite_pets %}
+        <div class="bg-white rounded-lg shadow p-4">
+          <img src="{{ pet.image.url }}" class="h-40 w-full object-cover rounded mb-2">
+          <h4 class="font-bold text-lg text-[#523a28]">{{ pet.name }}</h4>
+          <p class="text-sm text-[#8d6e63]">{{ pet.breed }}</p>
+        </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="text-gray-600">You haven't added any favorites yet.</p>
+    {% endif %}
+  </div>
+
+
+
+  <!-- Section: Adoption Requests -->
+  <div class="mb-10">
+    <h3 class="text-xl font-semibold text-[#c6302c] mb-3">📄 Adoption Requests</h3>
+    {% if adoption_requests %}
+    <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+      <thead>
+        <tr class="bg-[#fdf3e3] text-[#523a28]">
+          <th class="px-4 py-2 text-left">Pet</th>
+          <th class="px-4 py-2">Status</th>
+          <th class="px-4 py-2">Requested On</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in adoption_requests %}
+        <tr class="border-t">
+          <td class="px-4 py-2">{{ req.pet.name }}</td>
+          <td class="px-4 py-2">{{ req.status }}</td>
+          <td class="px-4 py-2">{{ req.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="text-gray-600">No adoption requests found.</p>
+    {% endif %}
+  </div>
+
+  <!-- Section: Donation History -->
+  <div>
+    <h3 class="text-xl font-semibold text-[#6d9f71] mb-3">💸 Donation History</h3>
+
+    <div class="mb-6">
+      <h4 class="font-semibold mb-1">General Donations</h4>
+      {% if general_donations %}
+      <ul class="list-disc list-inside">
+        {% for d in general_donations %}
+        <li>{{ d.amount }} THB - {{ d.created_at|date:"M d, Y" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="text-gray-600">No general donations made.</p>
+      {% endif %}
+    </div>
+
+    <div class="mb-6">
+      <h4 class="font-semibold mb-1">Medical Donations</h4>
+      {% if medical_donations %}
+      <ul class="list-disc list-inside">
+        {% for m in medical_donations %}
+        <li>{{ m.amount }} THB for {{ m.sponsorship.pet.name }} - {{ m.created_at|date:"M d, Y" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="text-gray-600">No medical donations made.</p>
+      {% endif %}
+    </div>
+
+    <div>
+      <h4 class="font-semibold mb-1">Sponsorship Donations</h4>
+      {% if sponsorship_donations %}
+      <ul class="list-disc list-inside">
+        {% for s in sponsorship_donations %}
+        <li>{{ s.amount }} THB for {{ s.pet.name }} - {{ s.created_at|date:"M d, Y" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <p class="text-gray-600">No sponsorship donations made.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

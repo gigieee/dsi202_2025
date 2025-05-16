@@ -1,6 +1,15 @@
 from django.contrib import admin
-from .models import StrayAnimal, GeneralDonation, MedicalSponsorship, SponsorshipDonation, AdoptionRequest, Blog
+from django.utils.html import format_html
+from .models import StrayAnimal, GeneralDonation, MedicalSponsorship, SponsorshipDonation, AdoptionRequest, Blog, MedicalDonation
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 
+admin.site.unregister(User)
+
+# ✅ Register again using your custom admin
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    list_display = ['username', 'email', 'is_active', 'last_login', 'date_joined']
 
 @admin.register(StrayAnimal)
 class StrayAnimalAdmin(admin.ModelAdmin):
@@ -20,14 +29,6 @@ class MedicalSponsorshipAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     search_fields = ('pet__name',)
 
-@admin.register(SponsorshipDonation)
-class SponsorshipDonationAdmin(admin.ModelAdmin):
-    list_display = ('donor_name', 'amount', 'get_pet_name', 'payment_method', 'created_at')
-    search_fields = ('donor_name', 'email', 'pet__name')
-
-    def get_pet_name(self, obj):
-        return obj.pet.name
-    get_pet_name.short_description = 'Pet Name'
 
 
 @admin.register(AdoptionRequest)
@@ -42,3 +43,29 @@ class AdoptionRequestAdmin(admin.ModelAdmin):
 class BlogAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_at')
     search_fields = ('title',)
+
+@admin.register(MedicalDonation)
+class MedicalDonationAdmin(admin.ModelAdmin):
+    list_display = ['donor_name', 'email', 'amount', 'created_at', 'slip_image_tag']
+    readonly_fields = ['slip_image_tag']
+    search_fields = ['donor_name', 'email']
+    list_filter = ['created_at']
+
+    def slip_image_tag(self, obj):
+        if obj.slip_image:
+            return format_html('<img src="{}" style="max-width:300px;" />', obj.slip_image.url)
+        return "-"
+    slip_image_tag.short_description = "Slip Preview"
+
+
+@admin.register(SponsorshipDonation)
+class SponsorshipDonationAdmin(admin.ModelAdmin):
+    list_display = ('donor_name', 'email', 'pet', 'amount', 'payment_method', 'created_at')
+    readonly_fields = ('preview_slip',)
+    fields = ('donor_name', 'email', 'pet', 'amount', 'payment_method', 'payment_slip', 'preview_slip', 'created_at')
+
+    def preview_slip(self, obj):
+        if obj.payment_slip:
+            return format_html('<img src="{}" style="max-height: 200px;" />', obj.payment_slip.url)
+        return "No Slip Uploaded"
+    preview_slip.short_description = "Slip Preview"

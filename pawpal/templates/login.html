@@ -1,35 +1,53 @@
-<!-- templates/login.html -->
 {% extends 'base.html' %}
 {% block title %}Login - PawPal{% endblock %}
+
 {% block content %}
-<div class="min-h-[80vh] flex items-center justify-center py-10 px-4 bg-gray-50">
-  <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
-    <h2 class="text-2xl font-bold text-[#6d9f71] text-center mb-6">Login to PawPal</h2>
-    <form method="post">
+<div class="min-h-screen flex items-center justify-center bg-[#fef9ec]">
+  <div class="bg-[#6d9f71] rounded-3xl shadow-xl p-10 w-full max-w-md">
+    <h2 class="text-3xl font-bold text-white text-center mb-8">Log in</h2>
+    <form method="post" action="{% url 'login' %}">
       {% csrf_token %}
 
-      <div class="mb-4">
-        <label for="username" class="block text-gray-700 font-medium mb-1">Username</label>
-        <input type="text" name="username" id="username" required
-               class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#6d9f71]">
+      <div class="mb-5">
+        <input type="text" name="username" placeholder="Email / Username" required
+               class="w-full px-4 py-3 rounded-full bg-white placeholder-[#8d6e63] text-[#523a28] focus:outline-none focus:ring-2 focus:ring-[#d55e00]" />
       </div>
 
-      <div class="mb-6">
-        <label for="password" class="block text-gray-700 font-medium mb-1">Password</label>
-        <input type="password" name="password" id="password" required
-               class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#6d9f71]">
+      <div class="mb-6 relative">
+        <input type="password" name="password" placeholder="Password" required
+               class="w-full px-4 py-3 rounded-full bg-white placeholder-[#8d6e63] text-[#523a28] focus:outline-none focus:ring-2 focus:ring-[#d55e00]" />
+        <!-- Eye icon (purely visual in this mockup) -->
+        <span class="absolute right-4 top-3 text-[#8d6e63] text-lg">👁</span>
       </div>
 
       <button type="submit"
-              class="w-full bg-[#6d9f71] text-white py-2 rounded hover:bg-[#5a8661] transition">
-        Login
+              class="w-full bg-[#d99a56] hover:bg-[#ba7e36] text-white font-bold py-2 rounded-full transition">
+        Continue
       </button>
-
-      <p class="mt-4 text-center text-sm text-gray-600">
-        Don't have an account?
-        <a href="{% url 'signup' %}" class="text-[#d55e00] hover:underline">Sign up</a>
-      </p>
     </form>
+
+    <!-- OR separator -->
+    <div class="flex items-center justify-center my-6 text-white font-semibold">
+      <hr class="w-1/3 border-white" />
+      <span class="mx-4">or</span>
+      <hr class="w-1/3 border-white" />
+    </div>
+
+    <!-- Google login -->
+    <div class="mb-4">
+      <a href="{% url 'social:begin' 'google-oauth2' %}" 
+         class="w-full inline-block bg-white text-gray-800 font-semibold py-2 px-4 rounded-full hover:bg-gray-100 text-center">
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 inline-block mr-2" alt="Google" />
+        Continue with Google
+      </a>
+    </div>
+
+
+    <!-- Sign Up link -->
+    <p class="text-center text-white text-sm">
+      don't have an account yet?
+      <a href="{% url 'signup' %}" class="font-bold underline hover:text-[#fef9ec]">Sign Up</a>
+    </p>
   </div>
 </div>
 {% endblock %}

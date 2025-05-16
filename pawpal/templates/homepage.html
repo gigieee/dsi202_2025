@@ -1,5 +1,3 @@
-<!-- templates/homepage.html -->
-
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Home - PawPal{% endblock %}
@@ -38,31 +36,32 @@
 <div class="mt-16">
     <h2 class="text-3xl font-bold text-center text-[#523a28] mb-6" style="font-family: 'Lexend', sans-serif;">Pets Available for Adoption Nearby</h2>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {% for pet in featured_animals %}
-
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {% for pet in featured_animals %}
+        <div onclick="openPetModal({{ pet.id }})"
+             class="relative bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.05] cursor-pointer">
       
-      <a href="{% url 'pet_detail' pet.id %}"
-       class="group block bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-
-        <!-- ❤️ ปุ่ม Favorite มุมขวาบน -->
-        <button class="absolute top-3 right-3 text-white hover:text-[#d55e00]">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
-              4.42 3 7.5 3c1.74 0 3.41 0.81 
-              4.5 2.09C13.09 3.81 14.76 3 
-              16.5 3 19.58 3 22 5.42 
-              22 8.5c0 3.78-3.4 6.86-8.55 
-              11.54L12 21.35z"/>
+          <!-- ❤️ ปุ่ม Favorite มุมขวาบน -->
+          <button onclick="event.stopPropagation(); toggleFavorite('{{ pet.id }}')"
+                  class="absolute top-2 right-2 z-10">
+            <svg id="heart-{{ pet.id }}" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                 stroke-width="2.5" stroke="white" class="w-8 h-8 transition duration-200" style="color: gray;">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                       2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81
+                       4.5 2.09C13.09 3.81 14.76 3
+                       16.5 3 19.58 3 22 5.42 22 8.5
+                       c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
           </button>
-        <!-- รูปสัตว์ -->
-        <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-56 object-cover">
-
-        <!-- ข้อมูล -->
-        <div class="p-4 text-left" style="font-family: 'Lexend', sans-serif;">
+      
+          <!-- รูปสัตว์ -->
+          <img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="w-full h-56 object-cover">
+      
+          <!-- ข้อมูล -->
+          <div class="p-4 text-left" style="font-family: 'Lexend', sans-serif;">
             <div class="flex justify-between items-center">
-              <h3 class="text-xl font-bold text-[#523a28]" style="font-family: 'Lexend', sans-serif;">{{ pet.name }}</h3>
+              <h3 class="text-xl font-bold text-[#523a28]">{{ pet.name }}</h3>
               {% if pet.gender == "male" %}
                 <span title="Male" class="text-blue-500 text-xl">♂</span>
               {% elif pet.gender == "female" %}
@@ -71,33 +70,20 @@
                 <span class="text-gray-400">?</span>
               {% endif %}
             </div>
-            <p class="text-sm text-[#8d6e63]" style="font-family: 'Lexend', sans-serif;">{{ pet.breed }}</p>
+            <p class="text-sm text-[#8d6e63]">{{ pet.breed }}</p>
+          </div>
         </div>
-
-        <!--View More -->
-        <div class="px-4 pb-4">
-            <p class="inline-block w-full text-center bg-[#6d9f71] text-white px-4 py-2 rounded-full font-semibold hover:bg-[#5a8861] transition">
-            View More </p>
+        {% endfor %}
+      
+        {% if remaining_animals > 0 %}
+        <div class="bg-[#5a8861] text-white rounded-xl shadow-md flex flex-col items-center justify-center p-6">
+          <p class="text-center text-lg">{{ remaining_animals }} more pets available</p>
+          <a href="{% url 'adopt' %}"
+             class="mt-4 bg-white text-[#dd6b20] px-6 py-2 rounded-full font-semibold hover:bg-[#eee] transition-all duration-300 hover:shadow-2xl hover:scale-[1.05]">
+            MEET THEM
+          </a>
         </div>
-        </a>
-        
-
-      {% endfor %}
-
-      {% if remaining_animals > 0 %}
-       <div class="bg-[#5a8861] text-white rounded-xl shadow-md flex flex-col items-center justify-center p-6">
-        <!-- ไอคอนเท้า -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor" class="w-12 h-12 mb-4">
-         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M5 13l4 4L19 7" />
-    </svg>
-    <p class="text-center text-lg">{{ remaining_animals }} more pets available</p>
-    <a href="{% url 'adopt' %}" class="mt-4 bg-white text-[#dd6b20] px-6 py-2 rounded-full font-semibold hover:bg-[#eee] transition">
-      MEET THEM
-    </a>
-  </div>
-{% endif %}
+        {% endif %}
     </div>
 </div>
 
@@ -146,30 +132,32 @@
     </div>
   </section>
   
-  <!-- Support Pop-up -->
-  <div id="supportPopup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden justify-center items-center">
-  <div class="bg-white p-6 rounded-xl max-w-md w-full relative">
-    <button onclick="closeSupportPopup()" class="absolute top-2 right-4 text-gray-500 hover:text-red-600 text-xl">&times;</button>
-    <h3 class="text-xl font-bold text-[#6d9f71] mb-4">Sponsor <span id="popupPetName"></span></h3>
-
-    <!-- Step 1: Fill amount -->
-    <input type="number" id="sponsorAmount" class="w-full mb-4 px-4 py-2 border rounded" placeholder="Enter amount (THB)">
-    <button onclick="showStaticQR()" class="w-full bg-[#6d9f71] text-white font-bold py-2 px-4 rounded-full">Continue</button>
-
-    <!-- Step 2: Show Static QR -->
-    <div id="qrSection" class="hidden mt-4 text-center">
-      <img src="{% static 'IMG_5331.JPG' %}" alt="PromptPay QR" class="w-48 mx-auto mb-4 rounded shadow">
-      <p class="text-sm text-gray-700 mb-2">Please transfer the amount shown above and upload payment slip.</p>
-      <input type="file" id="slipUpload" class="w-full mb-4">
-      <button onclick="confirmSupportDonation()" class="w-full bg-[#d55e00] text-white py-2 px-4 rounded-full">Confirm</button>
-    </div>
-
-    <!-- Step 3: Thank You -->
-    <div id="thankYouMessage" class="hidden text-center mt-4 text-[#6d9f71] font-semibold">
-      🙏 Thank you for your kindness!
+  <!-- Updated Support Pop-up with real QR, upload, and donation submission -->
+<div id="supportPopup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden justify-center items-center">
+    <div class="bg-white p-6 rounded-xl max-w-md w-full relative">
+      <button onclick="closeSupportPopup()" class="absolute top-2 right-4 text-gray-500 hover:text-red-600 text-xl">&times;</button>
+      <h3 class="text-xl font-bold text-[#6d9f71] mb-4">Sponsor <span id="popupPetName"></span></h3>
+  
+      <!-- Step 1: Enter amount -->
+      <input type="number" id="sponsorAmount" class="w-full mb-4 px-4 py-2 border rounded" placeholder="Enter amount (THB)">
+      <button id="sponsorContinueBtn" onclick="generateSponsorQR()" class="w-full bg-[#6d9f71] text-white font-bold py-2 px-4 rounded-full">
+        Continue
+      </button>
+      <!-- Step 2: Show QR + upload slip -->
+      <div id="sponsorQRSection" class="hidden mt-4 text-center">
+        <div id="sponsorQrImageContainer" class="mb-4"></div>
+        <p class="text-sm text-gray-700 mb-2">Scan and pay, then upload the slip below.</p>
+        <input type="file" id="sponsorSlipUpload" accept="image/*" class="w-full mb-4">
+        <button onclick="submitSponsorDonation()" class="w-full bg-[#d55e00] text-white py-2 px-4 rounded-full">Confirm</button>
+      </div>
+  
+      <!-- Step 3: Thank You -->
+      <div id="sponsorThankYou" class="hidden text-center mt-4 text-[#6d9f71] font-semibold">
+        🙏 Thank you for your kindness!
+      </div>
     </div>
   </div>
-</div>
+  
   
 <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
 <script>
@@ -189,31 +177,86 @@
     },
   });
 
-  // 📌 เปิด popup + reset state
+  let selectedPetId = null;
   function openSupportPopup(petId, petName) {
-    document.getElementById('popupPetName').textContent = petName;
-    document.getElementById('sponsorAmount').value = '';
-    document.getElementById('supportPopup').classList.remove('hidden');
-    document.getElementById('qrSection').classList.add('hidden');
-    document.getElementById('thankYouMessage').classList.add('hidden');
-  }
+  selectedPetId = petId;  // ✅ เก็บไว้ใช้ตอน POST
+  document.getElementById('popupPetName').textContent = petName;
+  document.getElementById('sponsorAmount').value = '';
+  document.getElementById('supportPopup').classList.remove('hidden');
+  document.getElementById('qrSection')?.classList.add('hidden');
+  document.getElementById('sponsorQRSection')?.classList.add('hidden');
+  document.getElementById('sponsorThankYou').classList.add('hidden');
+  document.getElementById('sponsorAmount').classList.remove('hidden');
+  document.querySelector('#supportPopup button.bg-[#6d9f71]').classList.remove('hidden');
+}
 
   function closeSupportPopup() {
     document.getElementById('supportPopup').classList.add('hidden');
   }
 
-  function showStaticQR() {
+  function generateSponsorQR() {
     const amount = document.getElementById('sponsorAmount').value;
     if (!amount) {
       alert("Please enter amount");
       return;
     }
-    document.getElementById('qrSection').classList.remove('hidden');
+    fetch(`/generate-promptpay-qr/?amount=${amount}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("sponsorQrImageContainer").innerHTML = `
+          <img src="data:image/png;base64,${data.qr}" class="w-40 mx-auto" />`;
+        document.getElementById('sponsorQRSection').classList.remove('hidden');
+      });
   }
 
-  function confirmSupportDonation() {
-    document.getElementById('qrSection').classList.add('hidden');
-    document.getElementById('thankYouMessage').classList.remove('hidden');
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
   }
+
+  function submitSponsorDonation() {
+  const formData = new FormData();
+  formData.append("pet_id", selectedPetId);
+  formData.append("amount", document.getElementById("sponsorAmount").value);
+  formData.append("payment_method", "promptpay");
+  formData.append("payment_slip", document.getElementById("sponsorSlipUpload").files[0]);
+
+  fetch("/donate/sponsor-submit/", {
+    method: "POST",
+    body: formData,
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken")
+    }
+  })
+  .then(res => {
+    if (res.ok) {
+      // ✅ ซ่อนทุก step ก่อนหน้า
+      document.getElementById('sponsorQRSection').classList.add('hidden');
+      document.getElementById('sponsorAmount').classList.add('hidden');
+      document.getElementById('sponsorContinueBtn').classList.add('hidden'); // ปุ่ม Continue
+
+      // ✅ แสดง thank you message
+      document.getElementById('sponsorThankYou').classList.remove('hidden');
+
+      // ✅ ปิด popup และรีเฟรชหลัง 2 วินาที
+      setTimeout(() => {
+        closeSupportPopup();
+        window.location.reload();
+      }, 2000);
+    } else {
+      return res.json().then(data => alert("❌ Failed: " + data.error));
+    }
+  });
+}
 </script>
   {% endblock %}

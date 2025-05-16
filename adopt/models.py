@@ -143,6 +143,7 @@ class StrayAnimal(models.Model):
 #Donation & Supporting 
 # Overview Donate - ไม่อิงสัตว์รายตัว
 class GeneralDonation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     donor_name = models.CharField(max_length=100)
     email = models.EmailField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -151,7 +152,7 @@ class GeneralDonation(models.Model):
         ('promptpay', 'PromptPay'),
         ('credit_card', 'Credit Card'),
     ])
-    slip_image = models.ImageField(upload_to='slips/', blank=True, null=True)
+    slip_image = models.ImageField(upload_to='donation_slips/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -160,6 +161,7 @@ class GeneralDonation(models.Model):
 
 # Medical Sponsorship - สำหรับกรณีบริจาคเพื่อการรักษาสัตว์
 class MedicalSponsorship(models.Model):
+    
     pet = models.ForeignKey("adopt.StrayAnimal", on_delete=models.CASCADE, related_name="medical_support")
     goal_amount = models.DecimalField(max_digits=10, decimal_places=2)
     current_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -175,9 +177,22 @@ class MedicalSponsorship(models.Model):
             return 0
         return min(round((self.current_amount / self.goal_amount) * 100, 2), 100)
 
+class MedicalDonation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    sponsorship = models.ForeignKey(MedicalSponsorship, on_delete=models.CASCADE, related_name='donations')
+    donor_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    slip_image = models.ImageField(upload_to='medical_donation_slips/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.donor_name} -> {self.sponsorship.pet.name} ({self.amount} THB)"
+
 
 # Record of donation under sponsorship
 class SponsorshipDonation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     pet = models.ForeignKey(
     StrayAnimal, 
     on_delete=models.CASCADE,
@@ -202,6 +217,7 @@ class SponsorshipDonation(models.Model):
 
 # Adoption
 class AdoptionRequest(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     pets = models.ManyToManyField(StrayAnimal, related_name='adoption_requests')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -235,3 +251,28 @@ class Blog(models.Model):
 
     def __str__(self):
         return self.title
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"To: {self.user.username} – {self.message[:40]}"
+    
+
+class FavoritePet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pet = models.ForeignKey('StrayAnimal', on_delete=models.CASCADE)
+
+class RecentlyViewedPet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pet = models.ForeignKey('StrayAnimal', on_delete=models.CASCADE)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+class PersonalityResult(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    result_pet = models.ForeignKey(StrayAnimal, on_delete=models.SET_NULL, null=True)
+    result_summary = models.TextField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)

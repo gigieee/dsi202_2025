@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Notifications – PawPal{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10 px-4">
+  <h1 class="text-3xl font-bold text-center text-[#523a28] mb-6">🔔 Your Notifications</h1>
+
+  {% if notifications %}
+    <ul class="space-y-4">
+      {% for note in notifications %}
+        <li class="bg-white shadow p-4 rounded-lg 
+                   {% if not note.is_read %}border-l-4 border-orange-400{% endif %}">
+          <p class="text-[#6d4c41]">{{ note.message }}</p>
+          <p class="text-sm text-gray-400">{{ note.created_at|date:"M d, Y H:i" }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-center text-gray-500">No notifications yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

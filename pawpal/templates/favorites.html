@@ -2,12 +2,17 @@
 {% block title %}Favorite Pets - PawPal{% endblock %}
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 py-10">
-  <h1 class="text-3xl font-bold text-center mb-6 text-[#4e6e4e]">Fav Lists</h1>
+  <h1 class="text-3xl font-bold text-center mb-6 text-[#4e6e4e]" style="font-family: 'Lexend', sans-serif;">Fav Lists</h1>
   <div id="favoritesContainer" class="space-y-6"></div>
 
   <div class="mt-10 flex justify-between items-center">
-    <label><input type="checkbox" id="selectAll"> All</label>
-    <button onclick="submitAdoption()" class="bg-[#6d9f71] text-white px-6 py-2 rounded-full font-bold">Adopt</button>
+    <label class="flex items-center gap-2 text-black text-sm" style="font-family: 'Lexend', sans-serif;">
+        <input type="checkbox" id="selectAll" class="w-6 h-6 accent-[#6d9f71]" style="font-family: 'Lexend', sans-serif;"> All
+      </label>
+      <button onclick="submitAdoption()"
+      class="bg-[#6d9f71] text-white px-6 py-2 rounded-full font-bold transform transition duration-200 hover:-translate-y-1 hover:bg-[#5a8861] shadow hover:shadow-lg">
+      Adopt
+    </button>
   </div>
 </div>
 
@@ -25,24 +30,40 @@
     container.innerHTML = "";
 
     data.pets.forEach(pet => {
-      const html = `
+        const gender = (pet.gender || "").toLowerCase();
+    let genderIcon = "";
+    if (gender === "male") {
+        genderIcon = '<span class="text-blue-500 text-xl ml-2">♂️</span>';
+    } else if (gender === "female") {
+        genderIcon = '<span class="text-pink-500 text-xl ml-2">♀️</span>';
+    }
+
+    const html = `
         <div class="flex gap-4 items-start bg-[#fefae0] rounded-xl shadow p-4">
-          <img src="${pet.image_url}" alt="${pet.name}" class="w-28 h-28 rounded-lg object-cover">
-          <div class="flex-grow">
-            <p class="font-bold">No. ${pet.pet_id}</p>
+            <img src="${pet.image_url}" alt="${pet.name}" class="w-36 h-36 rounded-lg object-cover shadow">
+            <div class="flex-grow space-y-1">
+            <!-- 👇 ชื่อ + เพศ ซ้ายบน -->
+            <div class="flex items-center gap-2">
+                <h2 class="text-xl font-bold text-[#523a28]" style="font-family: 'Lexend', sans-serif;">
+                ${pet.name}
+                </h2>
+                ${genderIcon}
+            </div>
+
+            <p class="font-semibold">No. ${pet.pet_id}</p>
             <p>Breed: ${pet.breed}</p>
-            <p>Gender: ${pet.gender}</p>
+            <p>Gender: ${pet.gender || "Unknown"}</p>
             <p>Age: ${pet.age}</p>
             <p>Personality: ${pet.personality}</p>
-          </div>
-          <div>
-            <input type="checkbox" class="selectPet" value="${pet.id}">
-          </div>
+            </div>
+            <div>
+            <input type="checkbox" class="selectPet w-10 h-10 accent-[#6d9f71]" value="${pet.id}">
+            </div>
         </div>
-      `;
-      container.innerHTML += html;
+        `;
+    container.innerHTML += html;
     });
-  }
+}
 
   function submitAdoption() {
     const selected = Array.from(document.querySelectorAll('.selectPet:checked')).map(el => el.value);

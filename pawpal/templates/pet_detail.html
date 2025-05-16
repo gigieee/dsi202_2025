@@ -20,7 +20,7 @@
 
             <!-- Action buttons -->
             <div class="flex gap-4 mt-4">
-                <a href="{% url 'request_adopt' pet.id %}" class="px-6 py-2 bg-[#d55e00] text-white rounded-full hover:bg-[#b54800]">Adopt</a>
+                <a href="{% url 'adoption_request' pet.id %}" class="px-6 py-2 bg-[#d55e00] text-white rounded-full hover:bg-[#b54800]">Adopt</a>
                 {% if sponsorship %}
                     <a href="{% url 'sponsorship_detail' sponsorship.id %}" class="px-6 py-2 bg-[#6d9f71] text-white rounded-full hover:bg-[#51865b]">Sponsor</a>
                 {% endif %}

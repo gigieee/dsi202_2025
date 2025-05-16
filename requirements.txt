@@ -1,4 +1,6 @@
 Django>=4.2
 Pillow
 django-multiselectfield>=0.1.12
-qrcode
+libscrc
+qrcode[pil]
+social-auth-app-django
