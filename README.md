@@ -69,7 +69,7 @@ PawPal จึงไม่ใช่แค่เว็บไซต์แนะน�
 ### 4.1 Prerequisites
 
 โปรดตรวจสอบการติดตั้งเครื่องมือต่อไปนี้บนระบบ ก่อนเริ่มต้น
-* Docker: สำหรับการรันแอปพลิเคชันใน container (ติดตั้งได้ที่ [Dowloand Docker](https://docs.docker.com/get-started/get-docker/))
+* Docker: สำหรับการรันแอปพลิเคชันใน container (ติดตั้งได้ที่ [Download Docker](https://docs.docker.com/get-started/get-docker/))
 * Docker Compose: สำหรับการจัดการ multi-container Docker applications (ติดตั้งได้ที่ [Docker-Compose Installation](https://docs.docker.com/compose/install/))
 * Git: สำหรับการ clone repository (ติดตั้งได้ที่ [Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git))
 
